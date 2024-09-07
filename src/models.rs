@@ -54,6 +54,20 @@ pub struct UserMetadata {
     pub sub: Option<String>,
 }
 
+#[derive(Debug, Serialize)]
+pub struct SignInWithIdTokenCredentials {
+    pub provider: Provider,
+    pub token: String,
+    pub access_token: Option<String>,
+    pub nonce: Option<String>,
+    pub gotrue_meta_security: Option<GotrueMetaSecurity>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct GotrueMetaSecurity {
+    captcha_token: Option<String>,
+}
+
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Identity {
     pub identity_id: String,
@@ -119,7 +133,7 @@ pub struct UpdateUserPayload {
     pub(crate) data: Option<serde_json::Value>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub enum Provider {
     Apple,
     Azure,
