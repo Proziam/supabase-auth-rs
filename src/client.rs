@@ -1,7 +1,7 @@
 use std::env;
 
 use reqwest::{
-    header::{self, HeaderValue, AUTHORIZATION, CONTENT_TYPE},
+    header::{self, HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE},
     Client, Response, StatusCode,
 };
 
@@ -9,8 +9,9 @@ use crate::{
     error::Error,
     models::{
         Provider, RequestMagicLinkPayload, Session, SignInWithEmailAndPasswordPayload,
-        SignInWithPhoneAndPasswordPayload, SignUpWithEmailAndPasswordPayload,
-        SignUpWithPhoneAndPasswordPayload, UpdateUserPayload, User,
+        SignInWithIdTokenCredentials, SignInWithPhoneAndPasswordPayload,
+        SignUpWithEmailAndPasswordPayload, SignUpWithPhoneAndPasswordPayload, UpdateUserPayload,
+        User,
     },
 };
 
@@ -327,6 +328,52 @@ impl AuthClient {
 
         Ok(serde_json::from_str::<User>(&response.unwrap())?)
     }
-    // log out current user
-    // invite user with email
+
+    /// Allows signing in with an OIDC ID token. The authentication provider used should be enabled and configured.
+    pub async fn sign_in_with_id_token(
+        &self,
+        credentials: SignInWithIdTokenCredentials,
+    ) -> Result<Session, Error> {
+        let mut headers = HeaderMap::new();
+        headers.insert("apikey", self.api_key.parse().unwrap());
+        headers.insert(CONTENT_TYPE, "application/json".parse().unwrap());
+
+        let body = serde_json::to_string(&credentials)?;
+
+        let response = self
+            .client
+            .post(format!(
+                "{}/auth/v1/token?grant_type=id_token",
+                self.project_url
+            ))
+            .headers(headers)
+            .body(body)
+            .send()
+            .await?
+            .text()
+            .await?;
+
+        Ok(serde_json::from_str(&response)?)
+    }
+
+    /// Sends an invite link to an email address.
+    pub async fn invite_user_by_email<S: Into<String>>(&self, email: S) -> Result<User, Error> {
+        let mut headers = HeaderMap::new();
+        headers.insert("apikey", self.api_key.parse().unwrap());
+        headers.insert(CONTENT_TYPE, "application/json".parse().unwrap());
+
+        let body = serde_json::to_string(&email.into())?;
+
+        let response = self
+            .client
+            .post(format!("{}/auth/v1/invite", self.project_url))
+            .headers(headers)
+            .body(body)
+            .send()
+            .await?
+            .text()
+            .await?;
+
+        Ok(serde_json::from_str(&response)?)
+    }
 }
