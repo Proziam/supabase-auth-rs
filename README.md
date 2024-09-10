@@ -7,7 +7,7 @@ This is a Rust implementation of the [supabase js auth client](https://github.co
 ### Cargo
 
 ```bash
-cargo add <crate-name-tbd> 
+cargo add supabase-auth 
 ```
 
 ## Differences to the JS client
@@ -15,8 +15,6 @@ cargo add <crate-name-tbd>
 It should be noted there are, and will likely always be, differences to the [JS client](https://github.com/supabase/gotrue-js). If something bothers you enough, contributions are welcome.
 
 This crate doesn't use pascalCase. Instead we use the snake_case convention.
-
-Also, the `<crate-name>` crate for Rust uses `chrono::DateTime`, whereas the [JS client](https://github.com/supabase/gotrue-js) keeps the date-time as strings.
 
 ## Usage (Won't be updated until 1.0.0)
 
