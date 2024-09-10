@@ -6,7 +6,7 @@ use supabase_auth::client::AuthClient;
 #[tokio::test]
 async fn create_client_test_valid() {
     let test_project_url = env::var("SUPABASE_URL").unwrap();
-    let test_api_key = env::var("SUPABASE_API").unwrap();
+    let test_api_key = env::var("SUPABASE_API_KEY").unwrap();
     let test_jwt_secret = env::var("SUPABASE_JWT_SECRET").unwrap();
 
     let auth_client = AuthClient::new(
