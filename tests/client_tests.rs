@@ -21,7 +21,7 @@ async fn create_client_test_valid() {
 #[tokio::test]
 async fn sign_in_with_password_test_valid() {
     let test_project_url = env::var("SUPABASE_URL").unwrap();
-    let test_api_key = env::var("SUPABASE_API").unwrap();
+    let test_api_key = env::var("SUPABASE_API_KEY").unwrap();
     let test_jwt_secret = env::var("SUPABASE_JWT_SECRET").unwrap();
 
     let auth_client = AuthClient::new(
@@ -47,7 +47,7 @@ async fn sign_in_with_password_test_valid() {
 #[tokio::test]
 async fn sign_in_with_password_test_invalid() {
     let test_project_url = env::var("SUPABASE_URL").unwrap();
-    let test_api_key = env::var("SUPABASE_API").unwrap();
+    let test_api_key = env::var("SUPABASE_API_KEY").unwrap();
     let test_jwt_secret = env::var("SUPABASE_JWT_SECRET").unwrap();
 
     let auth_client = AuthClient::new(
@@ -73,7 +73,7 @@ async fn sign_in_with_password_test_invalid() {
 #[tokio::test]
 async fn sign_up_with_email_test_valid() {
     let test_project_url = env::var("SUPABASE_URL").unwrap();
-    let test_api_key = env::var("SUPABASE_API").unwrap();
+    let test_api_key = env::var("SUPABASE_API_KEY").unwrap();
     let test_jwt_secret = env::var("SUPABASE_JWT_SECRET").unwrap();
 
     let auth_client = AuthClient::new(
@@ -105,7 +105,7 @@ async fn sign_up_with_email_test_valid() {
 #[tokio::test]
 async fn sign_up_with_phone_test_valid() {
     let test_project_url = env::var("SUPABASE_URL").unwrap();
-    let test_api_key = env::var("SUPABASE_API").unwrap();
+    let test_api_key = env::var("SUPABASE_API_KEY").unwrap();
     let test_jwt_secret = env::var("SUPABASE_JWT_SECRET").unwrap();
 
     let auth_client = AuthClient::new(
@@ -135,7 +135,7 @@ async fn sign_up_with_phone_test_valid() {
 #[tokio::test]
 async fn send_login_email_with_magic_link() {
     let test_project_url = env::var("SUPABASE_URL").unwrap();
-    let test_api_key = env::var("SUPABASE_API").unwrap();
+    let test_api_key = env::var("SUPABASE_API_KEY").unwrap();
     let test_jwt_secret = env::var("SUPABASE_JWT_SECRET").unwrap();
 
     let auth_client = AuthClient::new(
@@ -164,7 +164,7 @@ async fn send_login_email_with_magic_link() {
 #[tokio::test]
 async fn send_sms_with_otp() {
     let test_project_url = env::var("SUPABASE_URL").unwrap();
-    let test_api_key = env::var("SUPABASE_API").unwrap();
+    let test_api_key = env::var("SUPABASE_API_KEY").unwrap();
     let test_jwt_secret = env::var("SUPABASE_JWT_SECRET").unwrap();
 
     let auth_client = AuthClient::new(
@@ -191,7 +191,7 @@ async fn send_sms_with_otp() {
 #[tokio::test]
 async fn sign_in_with_oauth_test() {
     let test_project_url = env::var("SUPABASE_URL").unwrap();
-    let test_api_key = env::var("SUPABASE_API").unwrap();
+    let test_api_key = env::var("SUPABASE_API_KEY").unwrap();
     let test_jwt_secret = env::var("SUPABASE_JWT_SECRET").unwrap();
 
     let auth_client = AuthClient::new(
@@ -231,7 +231,7 @@ async fn sign_in_with_oauth_test() {
 #[tokio::test]
 async fn get_user_test() {
     let test_project_url = env::var("SUPABASE_URL").unwrap();
-    let test_api_key = env::var("SUPABASE_API").unwrap();
+    let test_api_key = env::var("SUPABASE_API_KEY").unwrap();
     let test_jwt_secret = env::var("SUPABASE_JWT_SECRET").unwrap();
 
     let auth_client = AuthClient::new(
@@ -264,7 +264,7 @@ async fn get_user_test() {
 #[tokio::test]
 async fn update_user_test() {
     let test_project_url = env::var("SUPABASE_URL").unwrap();
-    let test_api_key = env::var("SUPABASE_API").unwrap();
+    let test_api_key = env::var("SUPABASE_API_KEY").unwrap();
     let test_jwt_secret = env::var("SUPABASE_JWT_SECRET").unwrap();
 
     let auth_client = AuthClient::new(
