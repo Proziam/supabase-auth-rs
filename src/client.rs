@@ -30,34 +30,14 @@ pub struct AuthClient {
 
 impl AuthClient {
     /// Create a new AuthClient
-    /// Will use `SUPABASE_URL` `SUPABASE_API_KEY` and `SUPABASE_JWT_SECRET` environment variables if no params are provided
-    pub fn new<S: Into<String>>(
-        project_url: Option<S>,
-        api_key: Option<S>,
-        jwt_secret: Option<S>,
-    ) -> Self {
+    pub fn new(project_url: &str, api_key: &str, jwt_secret: &str) -> Self {
         let client = Client::new();
-
-        let project_url = project_url
-            .map(Into::into)
-            .or_else(|| env::var("SUPABASE_URL").ok())
-            .unwrap_or_else(String::new);
-
-        let api_key = api_key
-            .map(Into::into)
-            .or_else(|| env::var("SUPABASE_API_KEY").ok())
-            .unwrap_or_else(String::new);
-
-        let jwt_secret = jwt_secret
-            .map(Into::into)
-            .or_else(|| env::var("SUPABASE_JWT_SECRET").ok())
-            .unwrap_or_else(String::new);
 
         AuthClient {
             client,
-            project_url,
-            api_key,
-            jwt_secret,
+            project_url: project_url.to_string(),
+            api_key: api_key.to_string(),
+            jwt_secret: jwt_secret.to_string(),
         }
     }
 
