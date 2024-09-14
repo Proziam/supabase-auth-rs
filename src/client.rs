@@ -336,13 +336,7 @@ impl AuthClient {
             HeaderValue::from_str(&format!("Bearer {}", &bearer_token.into()))?,
         );
 
-        let payload = UpdateUserPayload {
-            email: updated_user.email,
-            password: updated_user.password,
-            data: updated_user.data,
-        };
-
-        let body = serde_json::to_string(&payload)?;
+        let body = serde_json::to_string::<UpdateUserPayload>(&updated_user)?;
 
         let response = self
             .client
