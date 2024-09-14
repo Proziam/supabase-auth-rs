@@ -8,10 +8,10 @@ use reqwest::{
 use crate::{
     error::Error,
     models::{
-        Provider, RequestMagicLinkPayload, Session, SignInWithEmailAndPasswordPayload,
-        SignInWithIdTokenCredentials, SignInWithPhoneAndPasswordPayload,
-        SignUpWithEmailAndPasswordPayload, SignUpWithPhoneAndPasswordPayload, UpdateUserPayload,
-        User, VerifyOtpParams,
+        Provider, RequestMagicLinkPayload, Session, SignInEmailOtpParams,
+        SignInWithEmailAndPasswordPayload, SignInWithEmailOtpPayload, SignInWithIdTokenCredentials,
+        SignInWithPhoneAndPasswordPayload, SignUpWithEmailAndPasswordPayload,
+        SignUpWithPhoneAndPasswordPayload, UpdateUserPayload, User, VerifyOtpParams,
     },
 };
 
@@ -211,6 +211,34 @@ impl AuthClient {
     // Login with SMS OTP
     pub async fn send_sms_with_otp<S: Into<String>>(&self, phone: S) -> Result<Response, Error> {
         let payload = phone.into();
+
+        let mut headers = header::HeaderMap::new();
+        headers.insert("Content-Type", "application/json".parse().unwrap());
+        headers.insert("apikey", self.api_key.parse().unwrap());
+
+        let body = serde_json::to_string(&payload)?;
+
+        let response = self
+            .client
+            .post(format!("{}/auth/v1/otp", self.project_url))
+            .headers(headers)
+            .body(body)
+            .send()
+            .await?;
+
+        Ok(response)
+    }
+
+    // Login with Email OTP
+    pub async fn send_email_with_otp<S: Into<String>>(
+        &self,
+        email: S,
+        options: Option<SignInEmailOtpParams>,
+    ) -> Result<Response, Error> {
+        let payload = SignInWithEmailOtpPayload {
+            email: email.into(),
+            options,
+        };
 
         let mut headers = header::HeaderMap::new();
         headers.insert("Content-Type", "application/json".parse().unwrap());

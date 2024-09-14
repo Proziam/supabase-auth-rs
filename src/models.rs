@@ -1,6 +1,6 @@
 use core::fmt;
 use serde::{Deserialize, Serialize};
-use std::fmt::Display;
+use std::fmt::{write, Display};
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct Session {
@@ -202,7 +202,67 @@ pub struct VerifyOtpOptions {
     pub redirect_to: Option<String>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
+pub enum SignInWithOtp {
+    Mobile(SignInMobileOtpParams),
+    Email(SignInEmailOtpParams),
+    WhatsApp(SignInMobileOtpParams),
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SignInWithEmailOtpPayload {
+    pub email: String,
+    pub options: Option<SignInEmailOtpParams>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SignInWithEmailOtp {
+    /// The user's phone number.
+    pub email: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub options: Option<SignInEmailOtpParams>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SignInEmailOtpParams {
+    /// Verification token received when the user completes the captcha on the site.
+    pub captcha_token: Option<String>,
+    /// A custom data object to store the user's metadata. This maps to the `auth.users.raw_user_meta_data` column.
+    pub data: Option<serde_json::Value>,
+    /// The redirect url embedded in the email link
+    pub email_redirect_to: Option<String>,
+    /// If set to false, this method will not create a new user. Defaults to true.
+    pub should_create_user: Option<bool>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SignInMobileOtpParams {
+    /// Verification token received when the user completes the captcha on the site.
+    pub captcha_token: Option<String>,
+    /// A custom data object to store the user's metadata. This maps to the `auth.users.raw_user_meta_data` column.
+    pub data: Option<serde_json::Value>,
+    /// The redirect url embedded in the email link
+    pub channel: Option<Channel>,
+    /// If set to false, this method will not create a new user. Defaults to true.
+    pub should_create_user: Option<bool>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum Channel {
+    Sms,
+    Whatsapp,
+}
+
+impl Display for Channel {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match *self {
+            Channel::Sms => write!(f, "sms"),
+            Channel::Whatsapp => write!(f, "whatsapp"),
+        }
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub enum Provider {
     Apple,
     Azure,
