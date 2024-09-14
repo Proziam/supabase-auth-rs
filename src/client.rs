@@ -220,7 +220,7 @@ impl AuthClient {
 
         let response = self
             .client
-            .post(format!("{}/auth/v1/opt", self.project_url))
+            .post(format!("{}/auth/v1/otp", self.project_url))
             .headers(headers)
             .body(body)
             .send()
