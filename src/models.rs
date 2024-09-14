@@ -133,6 +133,75 @@ pub struct UpdateUserPayload {
     pub(crate) data: Option<serde_json::Value>,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub enum VerifyOtpParams {
+    Mobile(VerifyMobileOtpParams),
+    Email(VerifyEmailOtpParams),
+    TokenHash(VerifyTokenHashParams),
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct VerifyMobileOtpParams {
+    /// The user's phone number.
+    pub phone: String,
+    /// The otp sent to the user's phone number.
+    pub token: String,
+    /// The user's verification type.
+    #[serde(rename = "type")]
+    pub otp_type: MobileOtpType,
+    /// Optional parameters
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub options: Option<VerifyOtpOptions>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct VerifyEmailOtpParams {
+    /// The user's phone number.
+    pub email: String,
+    /// The otp sent to the user's phone number.
+    pub token: String,
+    /// The user's verification type.
+    #[serde(rename = "type")]
+    pub otp_type: MobileOtpType,
+    /// Optional parameters
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub options: Option<VerifyOtpOptions>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct VerifyTokenHashParams {
+    /// The user's phone number.
+    pub token_hash: String,
+    /// The user's verification type.
+    #[serde(rename = "type")]
+    pub otp_type: MobileOtpType,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum EmailOtpType {
+    Signup,
+    Invite,
+    Magiclink,
+    Recovery,
+    EmailChange,
+    Email,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum MobileOtpType {
+    Sms,
+    PhoneChange,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct VerifyOtpOptions {
+    /// A URL to send the user to after they are confirmed.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub redirect_to: Option<String>,
+}
+
 #[derive(Debug, Serialize)]
 pub enum Provider {
     Apple,

@@ -11,7 +11,7 @@ use crate::{
         Provider, RequestMagicLinkPayload, Session, SignInWithEmailAndPasswordPayload,
         SignInWithIdTokenCredentials, SignInWithPhoneAndPasswordPayload,
         SignUpWithEmailAndPasswordPayload, SignUpWithPhoneAndPasswordPayload, UpdateUserPayload,
-        User,
+        User, VerifyOtpParams,
     },
 };
 
@@ -30,15 +30,36 @@ pub struct AuthClient {
 
 impl AuthClient {
     /// Create a new AuthClient
-    pub fn new(project_url: &str, api_key: &str, jwt_secret: &str) -> Self {
+    pub fn new(
+        project_url: impl Into<String>,
+        api_key: impl Into<String>,
+        jwt_secret: impl Into<String>,
+    ) -> Self {
         let client = Client::new();
 
         AuthClient {
             client,
-            project_url: project_url.to_string(),
-            api_key: api_key.to_string(),
-            jwt_secret: jwt_secret.to_string(),
+            project_url: project_url.into(),
+            api_key: api_key.into(),
+            jwt_secret: jwt_secret.into(),
         }
+    }
+
+    /// Create a new AuthClient from environment variables
+    /// Requires `SUPABASE_URL`, `SUPABASE_API_KEY`, and `SUPABASE_JWT_SECRET` environment variables
+    pub fn new_from_env() -> Result<AuthClient, Error> {
+        let client = Client::new();
+
+        let project_url = env::var("SUPABASE_URL")?;
+        let api_key = env::var("SUPABASE_API_KEY")?;
+        let jwt_secret = env::var("SUPABASE_JWT_SECRET")?;
+
+        Ok(AuthClient {
+            client,
+            project_url: project_url.into(),
+            api_key: api_key.into(),
+            jwt_secret: jwt_secret.into(),
+        })
     }
 
     pub async fn sign_in_with_email_and_password<S: Into<String>>(
@@ -54,7 +75,6 @@ impl AuthClient {
         let mut headers = header::HeaderMap::new();
         headers.insert("Content-Type", "application/json".parse().unwrap());
         headers.insert("apikey", self.api_key.parse().unwrap());
-
         let body = serde_json::to_string(&payload)?;
 
         let response = self
@@ -347,6 +367,31 @@ impl AuthClient {
         let response = self
             .client
             .post(format!("{}/auth/v1/invite", self.project_url))
+            .headers(headers)
+            .body(body)
+            .send()
+            .await?
+            .text()
+            .await?;
+
+        Ok(serde_json::from_str(&response)?)
+    }
+
+    pub async fn verify_otp(&self, params: VerifyOtpParams) -> Result<Session, Error> {
+        let mut headers = HeaderMap::new();
+        headers.insert("apikey", self.api_key.parse()?);
+        headers.insert(CONTENT_TYPE, "application/json".parse()?);
+
+        let body = match params {
+            VerifyOtpParams::Mobile(params) => serde_json::to_string(&params)?,
+            VerifyOtpParams::Email(params) => serde_json::to_string(&params)?,
+            VerifyOtpParams::TokenHash(params) => serde_json::to_string(&params)?,
+        };
+
+        let client = Client::new();
+
+        let response = client
+            .post(&format!("{}/verify", self.project_url))
             .headers(headers)
             .body(body)
             .send()

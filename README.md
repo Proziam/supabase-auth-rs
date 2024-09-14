@@ -16,6 +16,8 @@ It should be noted there are, and will likely always be, differences to the [JS 
 
 This crate doesn't use pascalCase. Instead we use the snake_case convention.
 
+Any features which are currently deprecated in the [JS client](https://github.com/supabase/gotrue-js) will not be supported.
+
 ## Usage (Won't be updated until 1.0.0)
 
 ```rust

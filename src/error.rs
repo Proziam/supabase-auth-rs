@@ -1,3 +1,5 @@
+use std::env;
+
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -22,4 +24,6 @@ pub enum Error {
     ParseError(#[from] serde_json::Error),
     #[error("Header Value is Invalid")]
     InvalidHeaderValue(#[from] reqwest::header::InvalidHeaderValue),
+    #[error("Environment Variable Unreadable")]
+    InvalidEnvironmentVariable(#[from] env::VarError),
 }
