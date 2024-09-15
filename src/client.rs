@@ -403,6 +403,10 @@ impl AuthClient {
         let mut headers = HeaderMap::new();
         headers.insert("apikey", self.api_key.parse()?);
         headers.insert(CONTENT_TYPE, "application/json".parse()?);
+        headers.insert(
+            AUTHORIZATION,
+            HeaderValue::from_str(&format!("Bearer {}", &self.api_key))?,
+        );
 
         let body = match params {
             VerifyOtpParams::Mobile(params) => serde_json::to_string(&params)?,

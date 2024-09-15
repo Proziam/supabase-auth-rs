@@ -162,7 +162,7 @@ pub struct VerifyEmailOtpParams {
     pub token: String,
     /// The user's verification type.
     #[serde(rename = "type")]
-    pub otp_type: MobileOtpType,
+    pub otp_type: EmailOtpType,
     /// Optional parameters
     #[serde(skip_serializing_if = "Option::is_none")]
     pub options: Option<VerifyOtpOptions>,
