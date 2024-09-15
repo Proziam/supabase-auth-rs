@@ -420,7 +420,7 @@ impl AuthClient {
         let client = Client::new();
 
         let response = client
-            .post(&format!("{}/verify", self.project_url))
+            .post(&format!("{}/auth/v1/verify", self.project_url))
             .headers(headers)
             .body(body)
             .send()
