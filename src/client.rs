@@ -11,7 +11,8 @@ use crate::{
         Provider, RequestMagicLinkPayload, Session, SignInEmailOtpParams,
         SignInWithEmailAndPasswordPayload, SignInWithEmailOtpPayload, SignInWithIdTokenCredentials,
         SignInWithPhoneAndPasswordPayload, SignUpWithEmailAndPasswordPayload,
-        SignUpWithPhoneAndPasswordPayload, UpdateUserPayload, User, VerifyOtpParams,
+        SignUpWithPhoneAndPasswordPayload, UpdateUserPayload, User, VerifyEmailOtpParams,
+        VerifyMobileOtpParams, VerifyOtpParams, VerifyTokenHashParams,
     },
 };
 
@@ -403,15 +404,17 @@ impl AuthClient {
         let mut headers = HeaderMap::new();
         headers.insert("apikey", self.api_key.parse()?);
         headers.insert(CONTENT_TYPE, "application/json".parse()?);
-        headers.insert(
-            AUTHORIZATION,
-            HeaderValue::from_str(&format!("Bearer {}", &self.api_key))?,
-        );
 
         let body = match params {
-            VerifyOtpParams::Mobile(params) => serde_json::to_string(&params)?,
-            VerifyOtpParams::Email(params) => serde_json::to_string(&params)?,
-            VerifyOtpParams::TokenHash(params) => serde_json::to_string(&params)?,
+            VerifyOtpParams::Mobile(params) => {
+                serde_json::to_string::<VerifyMobileOtpParams>(&params)?
+            }
+            VerifyOtpParams::Email(params) => {
+                serde_json::to_string::<VerifyEmailOtpParams>(&params)?
+            }
+            VerifyOtpParams::TokenHash(params) => {
+                serde_json::to_string::<VerifyTokenHashParams>(&params)?
+            }
         };
 
         let client = Client::new();

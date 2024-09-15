@@ -1,7 +1,10 @@
 use std::env;
 
 use reqwest::header;
-use supabase_auth::client::AuthClient;
+use supabase_auth::{
+    client::AuthClient,
+    models::{VerifyEmailOtpParams, VerifyOtpParams},
+};
 
 #[tokio::test]
 async fn create_client_test_valid() {

@@ -248,6 +248,7 @@ pub struct SignInMobileOtpParams {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum Channel {
     Sms,
     Whatsapp,
