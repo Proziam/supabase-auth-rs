@@ -14,8 +14,6 @@ cargo add supabase-auth
 
 It should be noted there are, and will likely always be, differences to the [JS client](https://github.com/supabase/gotrue-js). If something bothers you enough, contributions are welcome.
 
-This crate doesn't use pascalCase. Instead we use the snake_case convention.
-
 Any features which are currently deprecated in the [JS client](https://github.com/supabase/gotrue-js) will not be supported.
 
 ## Usage (Won't be updated until 1.0.0)
@@ -24,6 +22,23 @@ Any features which are currently deprecated in the [JS client](https://github.co
 
 // We're doing cool stuff in here
 ```
+
+## Features
+- [x] Create Client
+- [x] Sign In with Email & Password
+- [x] Sign In with Phone & Password
+- [x] Sign Up with Email & Password
+- [x] Sign Up with Phone & Password
+- [] Sign In with Third Party Auth (OAuth)
+- [] Sign In with Magic Link 
+- [x] Send Sign-In OTP (Email, SMS, Whatsapp)
+- [] Sign In with OTP
+- [] Refresh Session
+- [] Resend OTP Tokens (Email & SMS)
+- [x] Retrieve User
+- [] Reset Password
+- [] Change User Data (e.g., Email or password)
+- [] SSO
 
 ## Contributions
 
