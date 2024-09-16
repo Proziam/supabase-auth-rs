@@ -10,9 +10,9 @@ use crate::{
     models::{
         Provider, RequestMagicLinkPayload, Session, SignInEmailOtpParams,
         SignInWithEmailAndPasswordPayload, SignInWithEmailOtpPayload, SignInWithIdTokenCredentials,
-        SignInWithPhoneAndPasswordPayload, SignUpWithEmailAndPasswordPayload,
-        SignUpWithPhoneAndPasswordPayload, UpdateUserPayload, User, VerifyEmailOtpParams,
-        VerifyMobileOtpParams, VerifyOtpParams, VerifyTokenHashParams,
+        SignInWithOAuthOptions, SignInWithPhoneAndPasswordPayload,
+        SignUpWithEmailAndPasswordPayload, SignUpWithPhoneAndPasswordPayload, UpdateUserPayload,
+        User, VerifyEmailOtpParams, VerifyMobileOtpParams, VerifyOtpParams, VerifyTokenHashParams,
     },
 };
 
@@ -259,10 +259,16 @@ impl AuthClient {
     }
 
     // TODO: Add scopes and redirects and query params
-    pub async fn sign_in_with_oauth(&self, provider: Provider) -> Result<Response, Error> {
+    pub async fn sign_in_with_oauth(
+        &self,
+        provider: Provider,
+        options: Option<SignInWithOAuthOptions>,
+    ) -> Result<Response, Error> {
         let mut headers = header::HeaderMap::new();
         headers.insert("Content-Type", "application/json".parse().unwrap());
         headers.insert("apikey", self.api_key.parse().unwrap());
+
+        let body = serde_json::to_string(&options)?;
 
         let response = self
             .client
@@ -272,6 +278,7 @@ impl AuthClient {
                 provider.to_string()
             ))
             .headers(headers)
+            .body(body)
             .send()
             .await?;
 

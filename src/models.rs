@@ -1,6 +1,9 @@
 use core::fmt;
 use serde::{Deserialize, Serialize};
-use std::fmt::{write, Display};
+use std::{
+    collections::HashMap,
+    fmt::{write, Display},
+};
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct Session {
@@ -61,6 +64,14 @@ pub struct SignInWithIdTokenCredentials {
     pub access_token: Option<String>,
     pub nonce: Option<String>,
     pub gotrue_meta_security: Option<GotrueMetaSecurity>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct SignInWithOAuthOptions {
+    pub query_params: Option<HashMap<String, String>>,
+    pub redirect_to: Option<String>,
+    pub scopes: Option<String>,
+    pub skip_brower_redirect: Option<bool>,
 }
 
 #[derive(Debug, Serialize)]

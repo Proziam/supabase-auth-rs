@@ -1,10 +1,7 @@
-use std::env;
+use std::{collections::HashMap, env};
 
-use reqwest::header;
-use supabase_auth::{
-    client::AuthClient,
-    models::{VerifyEmailOtpParams, VerifyOtpParams},
-};
+use reqwest::{header, Body};
+use supabase_auth::{client::AuthClient, models::SignInWithOAuthOptions};
 
 #[tokio::test]
 async fn create_client_test_valid() {
@@ -184,9 +181,64 @@ async fn sign_in_with_oauth_test() {
     headers.insert("apikey", auth_client.api_key.parse().unwrap());
     headers.insert(header::AUTHORIZATION, auth_client.api_key.parse().unwrap());
 
+    let mut params = HashMap::new();
+    params.insert("key".to_string(), "value".to_string());
+    params.insert("second_key".to_string(), "second_value".to_string());
+    params.insert("third_key".to_string(), "third_value".to_string());
+
+    let options = SignInWithOAuthOptions {
+        query_params: Some(params),
+        redirect_to: Some("localhost".to_string()),
+        scopes: Some("repo gist notifications".to_string()),
+        skip_brower_redirect: Some(true),
+    };
+
     let response = auth_client
-        .sign_in_with_oauth(supabase_auth::models::Provider::Github)
+        .sign_in_with_oauth(supabase_auth::models::Provider::Github, Some(options))
         .await;
+
+    println!("SIGN IN WITH OAUTH TEST RESPONSE -- \n{:?}", response);
+
+    if response.is_err() {
+        eprintln!("{:?}", response.as_ref().unwrap_err())
+    }
+
+    assert!(response.is_ok())
+}
+
+#[tokio::test]
+async fn sign_in_with_oauth_no_options_test() {
+    let test_project_url = env::var("SUPABASE_URL").unwrap();
+    let test_api_key = env::var("SUPABASE_API_KEY").unwrap();
+    let test_jwt_secret = env::var("SUPABASE_JWT_SECRET").unwrap();
+
+    let auth_client = AuthClient::new(&test_project_url, &test_api_key, &test_jwt_secret);
+
+    // Must login to get a user bearer token
+    let demo_email = "demo@demo.com";
+    let demo_password = "qwerqwer";
+
+    let session = auth_client
+        .sign_in_with_email_and_password(demo_email, demo_password)
+        .await;
+
+    if session.is_err() {
+        eprintln!("{:?}", session.as_ref().unwrap_err())
+    }
+
+    let mut headers = header::HeaderMap::new();
+    headers.insert("Content-Type", "application/json".parse().unwrap());
+    headers.insert("apikey", auth_client.api_key.parse().unwrap());
+    headers.insert(header::AUTHORIZATION, auth_client.api_key.parse().unwrap());
+
+    let response = auth_client
+        .sign_in_with_oauth(supabase_auth::models::Provider::Github, None)
+        .await;
+
+    println!(
+        "SIGN IN WITH OAUTH \n NO OPTIONS TEST RESPONSE -- \n{:?}",
+        response
+    );
 
     if response.is_err() {
         eprintln!("{:?}", response.as_ref().unwrap_err())
