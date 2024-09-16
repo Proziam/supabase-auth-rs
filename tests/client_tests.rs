@@ -1,6 +1,6 @@
 use std::{collections::HashMap, env};
 
-use reqwest::{header, Body};
+use reqwest::header;
 use supabase_auth::{client::AuthClient, models::SignInWithOAuthOptions};
 
 #[tokio::test]
@@ -29,7 +29,7 @@ async fn sign_in_with_password_test_valid() {
         .sign_in_with_email_and_password(demo_email, demo_password)
         .await;
 
-    assert!(session.is_ok() && session.unwrap().user.email == demo_email)
+    assert!(session.unwrap().user.email == demo_email)
 }
 
 #[tokio::test]
@@ -49,6 +49,28 @@ async fn sign_in_with_password_test_invalid() {
 
     let session = auth_client
         .sign_in_with_email_and_password(demo_email, demo_password)
+        .await;
+
+    assert!(session.is_err())
+}
+
+#[tokio::test]
+async fn sign_in_with_phone_and_password_test() {
+    let test_project_url = env::var("SUPABASE_URL").unwrap();
+    let test_api_key = env::var("SUPABASE_API_KEY").unwrap();
+    let test_jwt_secret = env::var("SUPABASE_JWT_SECRET").unwrap();
+
+    let auth_client = AuthClient::new(&test_project_url, &test_api_key, &test_jwt_secret);
+
+    let demo_phone = "1234123412";
+    let demo_password = "qwerqwer";
+
+    let mut headers = header::HeaderMap::new();
+    headers.insert("Content-Type", "application/json".parse().unwrap());
+    headers.insert("apikey", auth_client.api_key.parse().unwrap());
+
+    let session = auth_client
+        .sign_in_with_email_and_password(demo_phone, demo_password)
         .await;
 
     assert!(session.is_err())

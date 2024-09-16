@@ -258,7 +258,7 @@ impl AuthClient {
         Ok(response)
     }
 
-    // TODO: Add scopes and redirects and query params
+    /// Sign in a user using an OAuth provider.
     pub async fn sign_in_with_oauth(
         &self,
         provider: Provider,
