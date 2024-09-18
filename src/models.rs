@@ -139,9 +139,9 @@ pub struct RequestMagicLinkPayload {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UpdateUserPayload {
-    pub(crate) email: Option<String>,
-    pub(crate) password: Option<String>,
-    pub(crate) data: Option<serde_json::Value>,
+    pub email: Option<String>,
+    pub password: Option<String>,
+    pub data: Option<serde_json::Value>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -256,6 +256,49 @@ pub struct SignInMobileOtpParams {
     pub channel: Option<Channel>,
     /// If set to false, this method will not create a new user. Defaults to true.
     pub should_create_user: Option<bool>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct RefreshSessionPayload {
+    pub refresh_token: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ResetPasswordForEmailPayload {
+    pub email: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum ResendParams {
+    Desktop(DesktopResendParams),
+    Mobile(MobileResendParams),
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DesktopResendParams {
+    #[serde(rename = "type")]
+    pub otp_type: EmailOtpType,
+    pub email: String,
+    pub options: Option<DesktopResendOptions>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DesktopResendOptions {
+    pub email_redirect_to: Option<String>,
+    pub captcha_token: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct MobileResendParams {
+    #[serde(rename = "type")]
+    pub otp_type: MobileOtpType,
+    pub phone: String,
+    pub options: Option<MobileResendOptions>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct MobileResendOptions {
+    captcha_token: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
