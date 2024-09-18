@@ -29,17 +29,16 @@ Any features which are currently deprecated in the [JS client](https://github.co
 - [x] Sign In with Phone & Password
 - [x] Sign Up with Email & Password
 - [x] Sign Up with Phone & Password
-- [] Sign In with Third Party Auth (OAuth)
-- [] Sign In with Magic Link 
+- [x] Sign In with Third Party Auth (OAuth)
+- [x] Sign In with Magic Link 
 - [x] Send Sign-In OTP (Email, SMS, Whatsapp)
-- [] Sign In with OTP
-- [] Refresh Session
-- [] Resend OTP Tokens (Email & SMS)
+- [x] Sign In with OTP
+- [x] Refresh Session
+- [x] Resend OTP Tokens (Email & SMS)
 - [x] Retrieve User
-- [] Reset Password
-- [] Change User Data (e.g., Email or password)
-- [] SSO
+- [x] Reset Password
+- [x] Change User Data (e.g., Email or password)
 
 ## Contributions
 
-Contributors are always welcome. I only ask that you add tests to cover any new functionality, and that any changes pass the existing tests before you put it on my plate. Until this crate reaches 1.0.0 we're in the "move fast and break things" phase. Don't concern yourself with elegance.
+Contributors are always welcome. I only ask that you add or update tests to cover your changes. Until this crate reaches 1.0.0 we're in the "move fast and break things" phase. Don't concern yourself with elegance.
