@@ -1,7 +1,10 @@
 use std::{collections::HashMap, env};
 
 use reqwest::header;
-use supabase_auth::{client::AuthClient, models::SignInWithOAuthOptions};
+use supabase_auth::{
+    client::AuthClient,
+    models::{DesktopResendParams, ResendParams, SignInWithOAuthOptions, UpdateUserPayload},
+};
 
 #[tokio::test]
 async fn create_client_test_valid() {
@@ -318,11 +321,127 @@ async fn update_user_test() {
         eprintln!("{:?}", session.as_ref().unwrap_err())
     }
 
-    let user = auth_client.get_user(session.unwrap().access_token).await;
+    let updated_user = UpdateUserPayload {
+        email: Some("demo@demo.com".to_string()),
+        password: Some("qqqqwwww".to_string()),
+        data: None,
+    };
 
-    if user.is_err() {
-        eprintln!("{:?}", user.as_ref().unwrap_err())
+    let first_response = auth_client
+        .update_user(updated_user, session.unwrap().access_token)
+        .await;
+
+    if first_response.is_err() {
+        eprintln!("{:?}", first_response.as_ref().unwrap_err())
     }
 
-    assert!(user.is_ok())
+    // Login with new password to validate the change
+    let test_password = "qqqqwwww";
+
+    let new_session = auth_client
+        .sign_in_with_email_and_password(demo_email, test_password)
+        .await;
+
+    if new_session.is_err() {
+        eprintln!("{:?}", new_session.as_ref().unwrap_err())
+    }
+
+    // Return the user to original condition
+    let original_user = UpdateUserPayload {
+        email: Some("demo@demo.com".to_string()),
+        password: Some("qwerqwer".to_string()),
+        data: None,
+    };
+
+    let second_response = auth_client
+        .update_user(original_user, new_session.unwrap().access_token)
+        .await;
+
+    assert!(second_response.is_ok())
+}
+
+#[tokio::test]
+async fn exchange_token_for_session() {
+    let test_project_url = env::var("SUPABASE_URL").unwrap();
+    let test_api_key = env::var("SUPABASE_API_KEY").unwrap();
+    let test_jwt_secret = env::var("SUPABASE_JWT_SECRET").unwrap();
+
+    let auth_client = AuthClient::new(&test_project_url, &test_api_key, &test_jwt_secret);
+
+    let demo_email = "demo@demo.com";
+    let demo_password = "qwerqwer";
+
+    let mut headers = header::HeaderMap::new();
+    headers.insert("Content-Type", "application/json".parse().unwrap());
+    headers.insert("apikey", auth_client.api_key.parse().unwrap());
+
+    let original_session = auth_client
+        .sign_in_with_email_and_password(demo_email, demo_password)
+        .await
+        .unwrap();
+
+    assert!(original_session.user.email == demo_email);
+
+    println!(
+        "REFRESH TOKEN BEING TESTED -- {}",
+        original_session.refresh_token
+    );
+
+    let new_session = auth_client
+        .refresh_session(original_session.refresh_token)
+        .await;
+
+    assert!(new_session.unwrap().user.email == demo_email)
+}
+
+#[tokio::test]
+async fn reset_password_for_email_test() {
+    let test_project_url = env::var("SUPABASE_URL").unwrap();
+    let test_api_key = env::var("SUPABASE_API_KEY").unwrap();
+    let test_jwt_secret = env::var("SUPABASE_JWT_SECRET").unwrap();
+
+    let auth_client = AuthClient::new(&test_project_url, &test_api_key, &test_jwt_secret);
+
+    let demo_email = "demo@demo.com";
+
+    let response = auth_client.reset_password_for_email(demo_email).await;
+
+    assert!(response.is_ok())
+}
+
+#[tokio::test]
+async fn resend_email_test() {
+    let test_project_url = env::var("SUPABASE_URL").unwrap();
+    let test_api_key = env::var("SUPABASE_API_KEY").unwrap();
+    let test_jwt_secret = env::var("SUPABASE_JWT_SECRET").unwrap();
+
+    let auth_client = AuthClient::new(&test_project_url, &test_api_key, &test_jwt_secret);
+
+    let uuid = uuid::Uuid::now_v7();
+
+    let demo_email = format!("signup__{}@demo.com", uuid);
+    let demo_password = "ciJUAojfZZYKfCxkiUWH";
+
+    let mut headers = header::HeaderMap::new();
+    headers.insert("Content-Type", "application/json".parse().unwrap());
+    headers.insert("apikey", auth_client.api_key.parse().unwrap());
+
+    let session = auth_client
+        // BUG: We need to run this without it instantly verifying
+        .sign_up_with_email_and_password(demo_email.clone(), demo_password.to_string())
+        .await;
+
+    if session.is_err() {
+        eprintln!("{:?}", session.as_ref().unwrap_err())
+    }
+
+    let credentials = DesktopResendParams {
+        otp_type: supabase_auth::models::EmailOtpType::Email,
+        email: demo_email.to_owned(),
+        options: None,
+    };
+
+    let response = auth_client.resend(ResendParams::Desktop(credentials)).await;
+
+    assert!(response.is_ok() && session.unwrap().user.email == demo_email)
 }
