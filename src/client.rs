@@ -2,13 +2,14 @@ use std::env;
 
 use reqwest::{
     header::{self, HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE},
-    Client, Response, StatusCode,
+    Client, Response,
 };
 
 use crate::{
     error::Error,
     models::{
-        Provider, RequestMagicLinkPayload, Session, SignInEmailOtpParams,
+        Provider, RefreshSessionPayload, RequestMagicLinkPayload, ResendParams,
+        ResetPasswordForEmailPayload, Session, SignInEmailOtpParams,
         SignInWithEmailAndPasswordPayload, SignInWithEmailOtpPayload, SignInWithIdTokenCredentials,
         SignInWithOAuthOptions, SignInWithPhoneAndPasswordPayload,
         SignUpWithEmailAndPasswordPayload, SignUpWithPhoneAndPasswordPayload, UpdateUserPayload,
@@ -306,28 +307,6 @@ impl AuthClient {
             .await?;
 
         Ok(serde_json::from_str(&user).unwrap())
-    }
-
-    /// Sends the user a log in link via email. Once logged in you should direct the user to a new password form. And use "Update User" below to save the new password.
-    pub async fn forgotten_password_email<S: Into<String>>(&self, email: S) -> Result<(), Error> {
-        let mut headers = header::HeaderMap::new();
-        headers.insert("apikey", self.api_key.parse().unwrap());
-        headers.insert(CONTENT_TYPE, "application/json".parse().unwrap());
-
-        let body = serde_json::to_string(&email.into())?;
-
-        let user = self
-            .client
-            .post(format!("{}/auth/v1/recover", self.project_url))
-            .headers(headers)
-            .body(body)
-            .send()
-            .await?;
-
-        match user.status() {
-            StatusCode::OK => Ok(()),
-            _ => Err(Error::InternalError),
-        }
     }
 
     /// Update the user with a new email or password. Each key (email, password, and data) is optional
