@@ -13,7 +13,7 @@ use crate::{
         SignInWithEmailAndPasswordPayload, SignInWithEmailOtpPayload, SignInWithIdTokenCredentials,
         SignInWithOAuthOptions, SignInWithPhoneAndPasswordPayload,
         SignUpWithEmailAndPasswordPayload, SignUpWithPhoneAndPasswordPayload, UpdateUserPayload,
-        User, VerifyEmailOtpParams, VerifyMobileOtpParams, VerifyOtpParams, VerifyTokenHashParams,
+        User, VerifyOtpParams,
     },
 };
 
