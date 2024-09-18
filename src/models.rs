@@ -1,9 +1,6 @@
 use core::fmt;
 use serde::{Deserialize, Serialize};
-use std::{
-    collections::HashMap,
-    fmt::{write, Display},
-};
+use std::{collections::HashMap, fmt::Display};
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct Session {
