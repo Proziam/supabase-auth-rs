@@ -427,4 +427,33 @@ impl AuthClient {
 
         Ok(serde_json::from_str(&response)?)
     }
+
+    pub async fn exchange_token_for_session<S: Into<String>>(
+        &self,
+        refresh_token: S,
+    ) -> Result<Session, Error> {
+        let mut headers = HeaderMap::new();
+        headers.insert("apikey", self.api_key.parse()?);
+        headers.insert(CONTENT_TYPE, "application/json".parse()?);
+
+        let body = serde_json::to_string(&RefreshSessionPayload {
+            refresh_token: refresh_token.into(),
+        })?;
+
+        let client = Client::new();
+
+        let response = client
+            .post(&format!(
+                "{}/auth/v1/token?grant_type=refresh_token",
+                self.project_url
+            ))
+            .headers(headers)
+            .body(body)
+            .send()
+            .await?
+            .text()
+            .await?;
+
+        Ok(serde_json::from_str(&response)?)
+    }
 }
