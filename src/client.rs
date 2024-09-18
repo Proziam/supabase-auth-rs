@@ -412,17 +412,7 @@ impl AuthClient {
         headers.insert("apikey", self.api_key.parse()?);
         headers.insert(CONTENT_TYPE, "application/json".parse()?);
 
-        let body = match params {
-            VerifyOtpParams::Mobile(params) => {
-                serde_json::to_string::<VerifyMobileOtpParams>(&params)?
-            }
-            VerifyOtpParams::Email(params) => {
-                serde_json::to_string::<VerifyEmailOtpParams>(&params)?
-            }
-            VerifyOtpParams::TokenHash(params) => {
-                serde_json::to_string::<VerifyTokenHashParams>(&params)?
-            }
-        };
+        let body = serde_json::to_string(&params)?;
 
         let client = Client::new();
 
