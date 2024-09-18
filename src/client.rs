@@ -460,4 +460,50 @@ impl AuthClient {
     pub async fn refresh_session(&self, refresh_token: String) -> Result<Session, Error> {
         self.exchange_token_for_session(refresh_token).await
     }
+
+    /// Send a password recovery email. Invalid Email addresses will return Error Code 400.
+    /// Valid email addresses that are not registered as users will not return an error.
+    pub async fn reset_password_for_email<S: Into<String>>(
+        &self,
+        email: S,
+    ) -> Result<Response, Error> {
+        let mut headers = HeaderMap::new();
+        headers.insert("apikey", self.api_key.parse()?);
+        headers.insert(CONTENT_TYPE, "application/json".parse()?);
+
+        let body = serde_json::to_string(&ResetPasswordForEmailPayload {
+            email: email.into(),
+        })?;
+
+        let client = Client::new();
+
+        let response = client
+            .post(&format!("{}/auth/v1/recover", self.project_url))
+            .headers(headers)
+            .body(body)
+            .send()
+            .await?;
+
+        Ok(response)
+    }
+
+    /// Resends an existing signup confirmation email, email change email, SMS OTP or phone change OTP.
+    pub async fn resend(&self, credentials: ResendParams) -> Result<Response, Error> {
+        let mut headers = HeaderMap::new();
+        headers.insert("apikey", self.api_key.parse()?);
+        headers.insert(CONTENT_TYPE, "application/json".parse()?);
+
+        let body = serde_json::to_string(&credentials)?;
+
+        let client = Client::new();
+
+        let response = client
+            .post(&format!("{}/auth/v1/resend", self.project_url))
+            .headers(headers)
+            .body(body)
+            .send()
+            .await?;
+
+        Ok(response)
+    }
 }
