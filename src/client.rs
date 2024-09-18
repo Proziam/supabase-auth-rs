@@ -456,4 +456,8 @@ impl AuthClient {
 
         Ok(serde_json::from_str(&response)?)
     }
+
+    pub async fn refresh_session(&self, refresh_token: String) -> Result<Session, Error> {
+        self.exchange_token_for_session(refresh_token).await
+    }
 }
