@@ -75,8 +75,8 @@ impl AuthClient {
         };
 
         let mut headers = header::HeaderMap::new();
-        headers.insert("Content-Type", "application/json".parse().unwrap());
-        headers.insert("apikey", self.api_key.parse().unwrap());
+        headers.insert(CONTENT_TYPE, HeaderValue::from_str("application/json")?);
+        headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
         let body = serde_json::to_string(&payload)?;
 
         let response = self
@@ -106,8 +106,8 @@ impl AuthClient {
         };
 
         let mut headers = header::HeaderMap::new();
-        headers.insert("Content-Type", "application/json".parse().unwrap());
-        headers.insert("apikey", self.api_key.parse().unwrap());
+        headers.insert(CONTENT_TYPE, HeaderValue::from_str("application/json")?);
+        headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
 
         let body = serde_json::to_string(&payload)?;
 
@@ -138,8 +138,8 @@ impl AuthClient {
         };
 
         let mut headers = header::HeaderMap::new();
-        headers.insert("Content-Type", "application/json".parse().unwrap());
-        headers.insert("apikey", self.api_key.parse().unwrap());
+        headers.insert(CONTENT_TYPE, HeaderValue::from_str("application/json")?);
+        headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
 
         let body = serde_json::to_string(&payload)?;
 
@@ -167,8 +167,8 @@ impl AuthClient {
         };
 
         let mut headers = header::HeaderMap::new();
-        headers.insert("Content-Type", "application/json".parse().unwrap());
-        headers.insert("apikey", self.api_key.parse().unwrap());
+        headers.insert(CONTENT_TYPE, HeaderValue::from_str("application/json")?);
+        headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
 
         let body = serde_json::to_string(&payload)?;
 
@@ -194,8 +194,8 @@ impl AuthClient {
         };
 
         let mut headers = header::HeaderMap::new();
-        headers.insert("Content-Type", "application/json".parse().unwrap());
-        headers.insert("apikey", self.api_key.parse().unwrap());
+        headers.insert(CONTENT_TYPE, HeaderValue::from_str("application/json")?);
+        headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
 
         let body = serde_json::to_string(&payload)?;
 
@@ -215,8 +215,8 @@ impl AuthClient {
         let payload = phone.into();
 
         let mut headers = header::HeaderMap::new();
-        headers.insert("Content-Type", "application/json".parse().unwrap());
-        headers.insert("apikey", self.api_key.parse().unwrap());
+        headers.insert(CONTENT_TYPE, HeaderValue::from_str("application/json")?);
+        headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
 
         let body = serde_json::to_string(&payload)?;
 
@@ -243,8 +243,8 @@ impl AuthClient {
         };
 
         let mut headers = header::HeaderMap::new();
-        headers.insert("Content-Type", "application/json".parse().unwrap());
-        headers.insert("apikey", self.api_key.parse().unwrap());
+        headers.insert(CONTENT_TYPE, HeaderValue::from_str("application/json")?);
+        headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
 
         let body = serde_json::to_string(&payload)?;
 
@@ -266,8 +266,8 @@ impl AuthClient {
         options: Option<SignInWithOAuthOptions>,
     ) -> Result<Response, Error> {
         let mut headers = header::HeaderMap::new();
-        headers.insert("Content-Type", "application/json".parse().unwrap());
-        headers.insert("apikey", self.api_key.parse().unwrap());
+        headers.insert(CONTENT_TYPE, HeaderValue::from_str("application/json")?);
+        headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
 
         let body = serde_json::to_string(&options)?;
 
@@ -289,13 +289,9 @@ impl AuthClient {
     /// Get the User struct of the logged in user
     pub async fn get_user<S: Into<String>>(&self, bearer_token: S) -> Result<User, Error> {
         let mut headers = header::HeaderMap::new();
-        headers.insert("apikey", self.api_key.parse().unwrap());
+        headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
         let token = format!("Bearer {}", &bearer_token.into());
-        headers.insert(
-            AUTHORIZATION,
-            // TODO: Handle this
-            HeaderValue::from_str(&token).unwrap(),
-        );
+        headers.insert(AUTHORIZATION, HeaderValue::from_str(&token)?);
 
         let user = self
             .client
@@ -306,7 +302,7 @@ impl AuthClient {
             .text()
             .await?;
 
-        Ok(serde_json::from_str(&user).unwrap())
+        Ok(serde_json::from_str(&user)?)
     }
 
     /// Update the user with a new email or password. Each key (email, password, and data) is optional
@@ -316,8 +312,8 @@ impl AuthClient {
         bearer_token: S,
     ) -> Result<User, Error> {
         let mut headers = header::HeaderMap::new();
-        headers.insert("apikey", self.api_key.parse().unwrap());
-        headers.insert(CONTENT_TYPE, "application/json".parse().unwrap());
+        headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
+        headers.insert(CONTENT_TYPE, HeaderValue::from_str("application/json")?);
         headers.insert(
             AUTHORIZATION,
             HeaderValue::from_str(&format!("Bearer {}", &bearer_token.into()))?,
@@ -344,8 +340,8 @@ impl AuthClient {
         credentials: SignInWithIdTokenCredentials,
     ) -> Result<Session, Error> {
         let mut headers = HeaderMap::new();
-        headers.insert("apikey", self.api_key.parse().unwrap());
-        headers.insert(CONTENT_TYPE, "application/json".parse().unwrap());
+        headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
+        headers.insert(CONTENT_TYPE, HeaderValue::from_str("application/json")?);
 
         let body = serde_json::to_string(&credentials)?;
 
@@ -368,8 +364,8 @@ impl AuthClient {
     /// Sends an invite link to an email address.
     pub async fn invite_user_by_email<S: Into<String>>(&self, email: S) -> Result<User, Error> {
         let mut headers = HeaderMap::new();
-        headers.insert("apikey", self.api_key.parse().unwrap());
-        headers.insert(CONTENT_TYPE, "application/json".parse().unwrap());
+        headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
+        headers.insert(CONTENT_TYPE, HeaderValue::from_str("application/json")?);
 
         let body = serde_json::to_string(&email.into())?;
 
@@ -388,8 +384,8 @@ impl AuthClient {
 
     pub async fn verify_otp(&self, params: VerifyOtpParams) -> Result<Session, Error> {
         let mut headers = HeaderMap::new();
-        headers.insert("apikey", self.api_key.parse()?);
-        headers.insert(CONTENT_TYPE, "application/json".parse()?);
+        headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
+        headers.insert(CONTENT_TYPE, HeaderValue::from_str("application/json")?);
 
         let body = serde_json::to_string(&params)?;
 
@@ -412,8 +408,8 @@ impl AuthClient {
         refresh_token: S,
     ) -> Result<Session, Error> {
         let mut headers = HeaderMap::new();
-        headers.insert("apikey", self.api_key.parse()?);
-        headers.insert(CONTENT_TYPE, "application/json".parse()?);
+        headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
+        headers.insert(CONTENT_TYPE, HeaderValue::from_str("application/json")?);
 
         let body = serde_json::to_string(&RefreshSessionPayload {
             refresh_token: refresh_token.into(),
@@ -447,8 +443,8 @@ impl AuthClient {
         email: S,
     ) -> Result<Response, Error> {
         let mut headers = HeaderMap::new();
-        headers.insert("apikey", self.api_key.parse()?);
-        headers.insert(CONTENT_TYPE, "application/json".parse()?);
+        headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
+        headers.insert(CONTENT_TYPE, HeaderValue::from_str("application/json")?);
 
         let body = serde_json::to_string(&ResetPasswordForEmailPayload {
             email: email.into(),
@@ -469,8 +465,8 @@ impl AuthClient {
     /// Resends an existing signup confirmation email, email change email, SMS OTP or phone change OTP.
     pub async fn resend(&self, credentials: ResendParams) -> Result<Response, Error> {
         let mut headers = HeaderMap::new();
-        headers.insert("apikey", self.api_key.parse()?);
-        headers.insert(CONTENT_TYPE, "application/json".parse()?);
+        headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
+        headers.insert(CONTENT_TYPE, HeaderValue::from_str("application/json")?);
 
         let body = serde_json::to_string(&credentials)?;
 
