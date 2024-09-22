@@ -311,6 +311,23 @@ impl AuthClient {
     }
 
     /// Sign in a user using an OAuth provider.
+    /// ```
+    /// // You can add custom parameters using a HashMap<String, String>
+    /// let mut params = HashMap::new();
+    /// params.insert("key".to_string(), "value".to_string());
+    ///
+    /// let options = SignInWithOAuthOptions {
+    ///     query_params: Some(params),
+    ///     redirect_to: Some("localhost".to_string()),
+    ///     scopes: Some("repo gist notifications".to_string()),
+    ///     skip_brower_redirect: Some(true),
+    /// };
+    ///
+    /// let response = auth_client
+    ///     .sign_in_with_oauth(supabase_auth::models::Provider::Github, Some(options))
+    ///     .await
+    ///     .unwrap();
+    /// ```
     pub async fn sign_in_with_oauth(
         &self,
         provider: Provider,
@@ -337,7 +354,15 @@ impl AuthClient {
         Ok(response)
     }
 
-    /// Get the User struct of the logged in user
+    /// Return the signed in User
+    /// ```
+    /// let user = auth_client
+    ///     .get_user(session.unwrap().access_token)
+    ///     .await
+    ///     .unwrap();
+    ///
+    /// assert!(user.email == demo_email)
+    /// ```
     pub async fn get_user<S: Into<String>>(&self, bearer_token: S) -> Result<User, Error> {
         let mut headers = header::HeaderMap::new();
         headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
@@ -356,7 +381,19 @@ impl AuthClient {
         Ok(serde_json::from_str(&user)?)
     }
 
-    /// Update the user with a new email or password. Each key (email, password, and data) is optional
+    /// Update the user, such as changing email or password. Each field (email, password, and data) is optional
+    /// ```
+    /// let updated_user_data = UpdateUserPayload {
+    ///     email: Some("demo@demo.com".to_string()),
+    ///     password: Some("demo_password".to_string()),
+    ///     data: None, // This field can hold any valid JSON value
+    /// };
+    ///
+    /// let user = auth_client
+    ///     .update_user(updated_user_data, access_token)
+    ///     .await
+    ///     .unwrap();
+    /// ```
     pub async fn update_user<S: Into<String>>(
         &self,
         updated_user: UpdateUserPayload,

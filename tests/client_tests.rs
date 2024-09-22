@@ -214,15 +214,12 @@ async fn sign_in_with_oauth_test() {
 
     let response = auth_client
         .sign_in_with_oauth(supabase_auth::models::Provider::Github, Some(options))
-        .await;
+        .await
+        .unwrap();
 
-    println!("SIGN IN WITH OAUTH TEST RESPONSE -- \n{:?}", response);
-
-    if response.is_err() {
-        eprintln!("{:?}", response.as_ref().unwrap_err())
+    if response.status() != 200 {
+        println!("SIGN IN WITH OAUTH TEST RESPONSE -- \n{:?}", response);
     }
-
-    assert!(response.is_ok())
 }
 
 #[tokio::test]
@@ -286,13 +283,12 @@ async fn get_user_test() {
         eprintln!("{:?}", session.as_ref().unwrap_err())
     }
 
-    let user = auth_client.get_user(session.unwrap().access_token).await;
+    let user = auth_client
+        .get_user(session.unwrap().access_token)
+        .await
+        .unwrap();
 
-    if user.is_err() {
-        eprintln!("{:?}", user.as_ref().unwrap_err())
-    }
-
-    assert!(user.is_ok())
+    assert!(user.email == demo_email)
 }
 
 #[tokio::test]
