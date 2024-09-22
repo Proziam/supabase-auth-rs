@@ -100,13 +100,10 @@ async fn sign_up_with_email_test_valid() {
 
     let session = auth_client
         .sign_up_with_email_and_password(demo_email.clone(), demo_password.to_string())
-        .await;
+        .await
+        .unwrap();
 
-    if session.is_err() {
-        eprintln!("{:?}", session.as_ref().unwrap_err())
-    }
-
-    assert!(session.is_ok() && session.unwrap().user.email == demo_email)
+    assert!(session.user.email == demo_email)
 }
 
 #[tokio::test]
@@ -149,15 +146,10 @@ async fn send_login_email_with_magic_link() {
     headers.insert("Content-Type", "application/json".parse().unwrap());
     headers.insert("apikey", auth_client.api_key.parse().unwrap());
 
-    let response = auth_client
+    let _response = auth_client
         .send_login_email_with_magic_link(demo_email)
-        .await;
-
-    if response.is_err() {
-        eprintln!("{:?}", response.as_ref().unwrap_err())
-    }
-
-    assert!(response.is_ok())
+        .await
+        .unwrap();
 }
 
 #[tokio::test]

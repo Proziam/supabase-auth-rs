@@ -18,7 +18,6 @@ use crate::{
 };
 
 /// Supabase Auth Client
-/// You can find your project url and keys at https://supabase.com/dashboard/project/<your project id>/settings/api
 pub struct AuthClient {
     pub client: Client,
     /// REST endpoint for querying and managing your database
@@ -31,7 +30,8 @@ pub struct AuthClient {
 }
 
 impl AuthClient {
-    /// Create a new AuthClient
+    /// Create a new Auth Client
+    /// You can find your project url and keys at https://supabase.com/dashboard/project/<your project id>/settings/api
     pub fn new(
         project_url: impl Into<String>,
         api_key: impl Into<String>,
@@ -49,6 +49,11 @@ impl AuthClient {
 
     /// Create a new AuthClient from environment variables
     /// Requires `SUPABASE_URL`, `SUPABASE_API_KEY`, and `SUPABASE_JWT_SECRET` environment variables
+    /// ```
+    /// let auth_client = AuthClient::new_from_env().unwrap();
+    ///
+    /// assert!(auth_client.project_url == env::var("SUPABASE_URL").unwrap())
+    /// ```
     pub fn new_from_env() -> Result<AuthClient, Error> {
         let client = Client::new();
 
@@ -64,6 +69,15 @@ impl AuthClient {
         })
     }
 
+    /// Sign in a user with an email and password
+    /// ```
+    /// let session = auth_client
+    ///     .sign_in_with_email_and_password(demo_email, demo_password)
+    ///     .await
+    ///     .unwrap();
+    ///
+    /// assert!(session.user.email == demo_email)
+    /// ```
     pub async fn sign_in_with_email_and_password<S: Into<String>>(
         &self,
         email: S,
@@ -95,6 +109,15 @@ impl AuthClient {
         Ok(serde_json::from_str(&response)?)
     }
 
+    /// Sign in a user with phone number and password
+    /// ```
+    /// let session = auth_client
+    ///     .sign_in_with_phone_and_password(demo_phone, demo_password)
+    ///     .await
+    ///     .unwrap();
+    ///
+    /// assert!(session.user.phone == demo_phone)
+    /// ```
     pub async fn sign_in_with_phone_and_password<S: Into<String>>(
         &self,
         phone: S,
@@ -127,6 +150,15 @@ impl AuthClient {
         Ok(serde_json::from_str(&response)?)
     }
 
+    /// Sign up a new user with an email and password
+    ///```
+    /// let session = auth_client
+    ///     .sign_up_with_email_and_password(demo_email, demo_password)
+    ///     .await
+    ///     .unwrap();
+    ///
+    /// assert!(session.user.email == demo_email)
+    ///```
     pub async fn sign_up_with_email_and_password<S: Into<String>>(
         &self,
         email: S,
@@ -156,6 +188,15 @@ impl AuthClient {
         Ok(serde_json::from_str::<Session>(&response)?)
     }
 
+    /// Sign up a new user with an email and password
+    ///```
+    /// let session = auth_client
+    ///     .sign_up_with_phone_and_password(demo_phone, demo_password)
+    ///     .await
+    ///     .unwrap();
+    ///
+    /// assert!(session.user.phone == demo_phone)
+    ///```
     pub async fn sign_up_with_phone_and_password<S: Into<String>>(
         &self,
         phone: S,
@@ -185,6 +226,13 @@ impl AuthClient {
         Ok(serde_json::from_str::<Session>(&response)?)
     }
 
+    /// Sends a login email containing a magic link
+    ///```
+    /// let _response = auth_client
+    ///     .send_login_email_with_magic_link(demo_email)
+    ///    .await
+    ///    .unwrap();
+    ///```
     pub async fn send_login_email_with_magic_link<S: Into<String>>(
         &self,
         email: S,
@@ -210,7 +258,10 @@ impl AuthClient {
         Ok(response)
     }
 
-    // Login with SMS OTP
+    /// Send a Login OTP via SMS
+    /// ```
+    /// let response = auth_client.send_sms_with_otp(demo_phone).await;
+    /// ```
     pub async fn send_sms_with_otp<S: Into<String>>(&self, phone: S) -> Result<Response, Error> {
         let payload = phone.into();
 
@@ -331,7 +382,7 @@ impl AuthClient {
             .text()
             .await;
 
-        Ok(serde_json::from_str::<User>(&response.unwrap())?)
+        Ok(serde_json::from_str::<User>(&response?)?)
     }
 
     /// Allows signing in with an OIDC ID token. The authentication provider used should be enabled and configured.
@@ -462,7 +513,7 @@ impl AuthClient {
         Ok(response)
     }
 
-    /// Resends an existing signup confirmation email, email change email, SMS OTP or phone change OTP.
+    /// Resends emails for existing signup confirmation, email change, SMS OTP, or phone change OTP.
     pub async fn resend(&self, credentials: ResendParams) -> Result<Response, Error> {
         let mut headers = HeaderMap::new();
         headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
