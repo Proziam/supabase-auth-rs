@@ -30,9 +30,10 @@ async fn sign_in_with_password_test_valid() {
 
     let session = auth_client
         .sign_in_with_email_and_password(demo_email, demo_password)
-        .await;
+        .await
+        .unwrap();
 
-    assert!(session.unwrap().user.email == demo_email)
+    assert!(session.user.email == demo_email)
 }
 
 #[tokio::test]
@@ -73,10 +74,11 @@ async fn sign_in_with_phone_and_password_test() {
     headers.insert("apikey", auth_client.api_key.parse().unwrap());
 
     let session = auth_client
-        .sign_in_with_email_and_password(demo_phone, demo_password)
-        .await;
+        .sign_in_with_phone_and_password(demo_phone, demo_password)
+        .await
+        .unwrap();
 
-    assert!(session.is_err())
+    assert!(session.user.phone == demo_phone)
 }
 
 #[tokio::test]
