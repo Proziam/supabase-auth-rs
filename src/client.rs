@@ -417,9 +417,9 @@ impl AuthClient {
             .send()
             .await?
             .text()
-            .await;
+            .await?;
 
-        Ok(serde_json::from_str::<User>(&response?)?)
+        Ok(serde_json::from_str(&response)?)
     }
 
     /// Allows signing in with an OIDC ID token. The authentication provider used should be enabled and configured.
