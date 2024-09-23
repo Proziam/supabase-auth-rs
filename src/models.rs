@@ -368,3 +368,14 @@ impl Display for Provider {
         }
     }
 }
+
+// Implement custom Debug to avoid exposing sensitive information
+impl fmt::Debug for crate::client::AuthClient {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("AuthClient")
+            .field("project_url", &self.project_url)
+            .field("api_key", &"[REDACTED]")
+            .field("jwt_secret", &"[REDACTED]")
+            .finish()
+    }
+}

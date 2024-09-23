@@ -18,7 +18,6 @@ use crate::{
 };
 
 /// Supabase Auth Client
-#[derive(Debug)]
 pub struct AuthClient {
     pub client: Client,
     /// REST endpoint for querying and managing your database
