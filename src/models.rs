@@ -1,6 +1,19 @@
 use core::fmt;
+use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, fmt::Display};
+
+/// Supabase Auth Client
+pub struct AuthClient {
+    pub(crate) client: Client,
+    /// REST endpoint for querying and managing your database
+    /// Example: https://<project id>.supabase.co
+    pub(crate) project_url: String,
+    /// WARN: The `service role` key has the ability to bypass Row Level Security. Never share it publicly.
+    pub(crate) api_key: String,
+    /// Used to decode your JWTs. You can also use this to mint your own JWTs.
+    pub(crate) jwt_secret: String,
+}
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct Session {
