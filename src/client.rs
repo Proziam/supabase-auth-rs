@@ -1,3 +1,5 @@
+#![cfg(not(doctest))]
+
 use std::env;
 
 use reqwest::{
