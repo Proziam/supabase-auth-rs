@@ -37,10 +37,8 @@ impl AuthClient {
         api_key: impl Into<String>,
         jwt_secret: impl Into<String>,
     ) -> Self {
-        let client = Client::new();
-
         AuthClient {
-            client,
+            client: Client::new(),
             project_url: project_url.into(),
             api_key: api_key.into(),
             jwt_secret: jwt_secret.into(),
@@ -55,8 +53,6 @@ impl AuthClient {
     /// assert!(auth_client.project_url == env::var("SUPABASE_URL").unwrap())
     /// ```
     pub fn new_from_env() -> Result<AuthClient, Error> {
-        let client = Client::new();
-
         let project_url = env::var("SUPABASE_URL")?;
         let api_key = env::var("SUPABASE_API_KEY")?;
         let jwt_secret = env::var("SUPABASE_JWT_SECRET")?;
@@ -66,6 +62,7 @@ impl AuthClient {
             project_url: project_url.into(),
             api_key: api_key.into(),
             jwt_secret: jwt_secret.into(),
+            client: Client::new(),
         })
     }
 
@@ -477,9 +474,8 @@ impl AuthClient {
 
         let body = serde_json::to_string(&params)?;
 
-        let client = Client::new();
-
-        let response = client
+        let response = self
+            .client
             .post(&format!("{}/auth/v1/verify", self.project_url))
             .headers(headers)
             .body(body)
@@ -503,9 +499,8 @@ impl AuthClient {
             refresh_token: refresh_token.into(),
         })?;
 
-        let client = Client::new();
-
-        let response = client
+        let response = self
+            .client
             .post(&format!(
                 "{}/auth/v1/token?grant_type=refresh_token",
                 self.project_url
@@ -538,9 +533,8 @@ impl AuthClient {
             email: email.into(),
         })?;
 
-        let client = Client::new();
-
-        let response = client
+        let response = self
+            .client
             .post(&format!("{}/auth/v1/recover", self.project_url))
             .headers(headers)
             .body(body)
@@ -558,9 +552,8 @@ impl AuthClient {
 
         let body = serde_json::to_string(&credentials)?;
 
-        let client = Client::new();
-
-        let response = client
+        let response = self
+            .client
             .post(&format!("{}/auth/v1/resend", self.project_url))
             .headers(headers)
             .body(body)
