@@ -37,6 +37,7 @@ impl AuthClient {
 
     /// Create a new AuthClient from environment variables
     /// Requires `SUPABASE_URL`, `SUPABASE_API_KEY`, and `SUPABASE_JWT_SECRET` environment variables
+    /// # Example
     /// ```
     /// let auth_client = AuthClient::new_from_env().unwrap();
     ///
@@ -56,6 +57,7 @@ impl AuthClient {
     }
 
     /// Sign in a user with an email and password
+    /// # Example
     /// ```
     /// let session = auth_client
     ///     .sign_in_with_email_and_password(demo_email, demo_password)
@@ -96,6 +98,7 @@ impl AuthClient {
     }
 
     /// Sign in a user with phone number and password
+    /// # Example
     /// ```
     /// let session = auth_client
     ///     .sign_in_with_phone_and_password(demo_phone, demo_password)
@@ -137,6 +140,7 @@ impl AuthClient {
     }
 
     /// Sign up a new user with an email and password
+    /// # Example
     /// ```
     /// let session = auth_client
     ///     .sign_up_with_email_and_password(demo_email, demo_password)
@@ -175,6 +179,7 @@ impl AuthClient {
     }
 
     /// Sign up a new user with an email and password
+    /// # Example
     /// ```
     /// let session = auth_client
     ///     .sign_up_with_phone_and_password(demo_phone, demo_password)
@@ -213,6 +218,7 @@ impl AuthClient {
     }
 
     /// Sends a login email containing a magic link
+    /// # Example
     /// ```
     /// let _response = auth_client
     ///     .send_login_email_with_magic_link(demo_email)
@@ -245,6 +251,7 @@ impl AuthClient {
     }
 
     /// Send a Login OTP via SMS
+    /// # Example
     /// ```
     /// let response = auth_client.send_sms_with_otp(demo_phone).await;
     /// ```
@@ -268,7 +275,11 @@ impl AuthClient {
         Ok(response)
     }
 
-    // Login with Email OTP
+    /// Send a Login OTP via email
+    /// # Example
+    /// ```
+    /// let send = auth_client.send_sms_with_otp(demo_phone).await.unwrap();
+    /// ```
     pub async fn send_email_with_otp<S: Into<String>>(
         &self,
         email: S,
@@ -297,6 +308,7 @@ impl AuthClient {
     }
 
     /// Sign in a user using an OAuth provider.
+    /// # Example
     /// ```
     /// // You can add custom parameters using a HashMap<String, String>
     /// let mut params = HashMap::new();
@@ -341,6 +353,7 @@ impl AuthClient {
     }
 
     /// Return the signed in User
+    /// # Example
     /// ```
     /// let user = auth_client
     ///     .get_user(session.unwrap().access_token)
@@ -368,6 +381,7 @@ impl AuthClient {
     }
 
     /// Update the user, such as changing email or password. Each field (email, password, and data) is optional
+    /// # Example
     /// ```
     /// let updated_user_data = UpdateUserPayload {
     ///     email: Some("demo@demo.com".to_string()),
@@ -408,6 +422,7 @@ impl AuthClient {
         Ok(serde_json::from_str(&response)?)
     }
 
+    // TODO: Add test
     /// Allows signing in with an OIDC ID token. The authentication provider used should be enabled and configured.
     pub async fn sign_in_with_id_token(
         &self,
@@ -435,6 +450,7 @@ impl AuthClient {
         Ok(serde_json::from_str(&response)?)
     }
 
+    // TODO: Add test
     /// Sends an invite link to an email address.
     pub async fn invite_user_by_email<S: Into<String>>(&self, email: S) -> Result<User, Error> {
         let mut headers = HeaderMap::new();
@@ -456,6 +472,7 @@ impl AuthClient {
         Ok(serde_json::from_str(&response)?)
     }
 
+    // TODO: Add test
     pub async fn verify_otp(&self, params: VerifyOtpParams) -> Result<Session, Error> {
         let mut headers = HeaderMap::new();
         headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
@@ -476,6 +493,21 @@ impl AuthClient {
         Ok(serde_json::from_str(&response)?)
     }
 
+    /// Exchange refresh token for a new session
+    /// # Example
+    /// ```
+    /// // When a user signs in they get a session
+    /// let original_session = auth_client
+    ///     .sign_in_with_email_and_password(demo_email.as_ref(), demo_password)
+    ///     .await
+    ///     .unwrap();
+    ///
+    /// // Exchange the refresh token from the original session to create a new session
+    /// let new_session = auth_client
+    ///     .refresh_session(original_session.refresh_token)
+    ///     .await
+    ///     .unwrap();
+    /// ```
     pub async fn exchange_token_for_session<S: Into<String>>(
         &self,
         refresh_token: S,
@@ -510,6 +542,10 @@ impl AuthClient {
 
     /// Send a password recovery email. Invalid Email addresses will return Error Code 400.
     /// Valid email addresses that are not registered as users will not return an error.
+    /// # Example
+    /// ```
+    /// let response = auth_client.reset_password_for_email(demo_email).await.unwrap();
+    /// ```
     pub async fn reset_password_for_email<S: Into<String>>(
         &self,
         email: S,
@@ -534,14 +570,25 @@ impl AuthClient {
     }
 
     /// Resends emails for existing signup confirmation, email change, SMS OTP, or phone change OTP.
-    pub async fn resend(&self, credentials: ResendParams) -> Result<Response, Error> {
+    /// # Example
+    /// ```
+    /// // Resend can also take MobileResendParams
+    /// let credentials = DesktopResendParams {
+    ///     otp_type: supabase_auth::models::EmailOtpType::Email,
+    ///     email: demo_email.to_owned(),
+    ///     options: None,
+    /// };
+    ///
+    /// let resend = auth_client.resend(ResendParams::Desktop(credentials)).await;
+    /// ```
+    pub async fn resend(&self, credentials: ResendParams) -> Result<(), Error> {
         let mut headers = HeaderMap::new();
         headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
         headers.insert(CONTENT_TYPE, HeaderValue::from_str("application/json")?);
 
         let body = serde_json::to_string(&credentials)?;
 
-        let response = self
+        let _response = self
             .client
             .post(&format!("{}/auth/v1/resend", self.project_url))
             .headers(headers)
@@ -549,7 +596,7 @@ impl AuthClient {
             .send()
             .await?;
 
-        Ok(response)
+        Ok(())
     }
 
     // Add getter methods for private fields
