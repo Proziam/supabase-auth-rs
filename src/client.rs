@@ -551,4 +551,17 @@ impl AuthClient {
 
         Ok(response)
     }
+
+    // Add getter methods for private fields
+    pub fn project_url(&self) -> &String {
+        &self.project_url
+    }
+
+    pub fn api_key(&self) -> &String {
+        &self.api_key
+    }
+
+    pub fn jwt_secret(&self) -> &String {
+        &self.jwt_secret
+    }
 }
