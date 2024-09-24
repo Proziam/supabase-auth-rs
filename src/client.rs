@@ -10,7 +10,7 @@ use reqwest::{
 use crate::{
     error::Error,
     models::{
-        Provider, RefreshSessionPayload, RequestMagicLinkPayload, ResendParams,
+        AuthClient, Provider, RefreshSessionPayload, RequestMagicLinkPayload, ResendParams,
         ResetPasswordForEmailPayload, Session, SignInEmailOtpParams,
         SignInWithEmailAndPasswordPayload, SignInWithEmailOtpPayload, SignInWithIdTokenCredentials,
         SignInWithOAuthOptions, SignInWithPhoneAndPasswordPayload,
@@ -18,18 +18,6 @@ use crate::{
         User, VerifyOtpParams,
     },
 };
-
-/// Supabase Auth Client
-pub struct AuthClient {
-    pub client: Client,
-    /// REST endpoint for querying and managing your database
-    /// Example: https://<project id>.supabase.co
-    pub project_url: String,
-    /// WARN: The `service role` key has the ability to bypass Row Level Security. Never share it publicly.
-    pub api_key: String,
-    /// Used to decode your JWTs. You can also use this to mint your own JWTs.
-    pub jwt_secret: String,
-}
 
 impl AuthClient {
     /// Create a new Auth Client
@@ -60,11 +48,10 @@ impl AuthClient {
         let jwt_secret = env::var("SUPABASE_JWT_SECRET")?;
 
         Ok(AuthClient {
-            client,
-            project_url: project_url.into(),
-            api_key: api_key.into(),
-            jwt_secret: jwt_secret.into(),
             client: Client::new(),
+            project_url,
+            api_key,
+            jwt_secret,
         })
     }
 
@@ -150,7 +137,7 @@ impl AuthClient {
     }
 
     /// Sign up a new user with an email and password
-    ///```
+    /// ```
     /// let session = auth_client
     ///     .sign_up_with_email_and_password(demo_email, demo_password)
     ///     .await
@@ -188,7 +175,7 @@ impl AuthClient {
     }
 
     /// Sign up a new user with an email and password
-    ///```
+    /// ```
     /// let session = auth_client
     ///     .sign_up_with_phone_and_password(demo_phone, demo_password)
     ///     .await
@@ -226,7 +213,7 @@ impl AuthClient {
     }
 
     /// Sends a login email containing a magic link
-    ///```
+    /// ```
     /// let _response = auth_client
     ///     .send_login_email_with_magic_link(demo_email)
     ///    .await
