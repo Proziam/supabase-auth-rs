@@ -248,7 +248,7 @@ async fn update_user_test() {
     }
 
     let updated_user = UpdateUserPayload {
-        email: Some("demo@demo.com".to_string()),
+        email: Some(demo_email.clone()),
         password: Some("qqqqwwww".to_string()),
         data: None,
     };
@@ -274,7 +274,7 @@ async fn update_user_test() {
 
     // Return the user to original condition
     let original_user = UpdateUserPayload {
-        email: Some("demo@demo.com".to_string()),
+        email: Some(demo_email),
         password: Some("qwerqwer".to_string()),
         data: None,
     };
