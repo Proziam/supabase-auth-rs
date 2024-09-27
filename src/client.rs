@@ -10,10 +10,10 @@ use reqwest::{
 use crate::{
     error::Error,
     models::{
-        AuthClient, Provider, RefreshSessionPayload, RequestMagicLinkPayload, ResendParams,
-        ResetPasswordForEmailPayload, Session, SignInEmailOtpParams,
-        SignInWithEmailAndPasswordPayload, SignInWithEmailOtpPayload, SignInWithIdTokenCredentials,
-        SignInWithOAuthOptions, SignInWithPhoneAndPasswordPayload,
+        AuthClient, AuthServerHealth, AuthServerSettings, Provider, RefreshSessionPayload,
+        RequestMagicLinkPayload, ResendParams, ResetPasswordForEmailPayload, Session,
+        SignInEmailOtpParams, SignInWithEmailAndPasswordPayload, SignInWithEmailOtpPayload,
+        SignInWithIdTokenCredentials, SignInWithOAuthOptions, SignInWithPhoneAndPasswordPayload,
         SignUpWithEmailAndPasswordPayload, SignUpWithPhoneAndPasswordPayload, UpdateUserPayload,
         User, VerifyOtpParams,
     },
@@ -485,6 +485,54 @@ impl AuthClient {
             .post(&format!("{}/auth/v1/verify", self.project_url))
             .headers(headers)
             .body(body)
+            .send()
+            .await?
+            .text()
+            .await?;
+
+        Ok(serde_json::from_str(&response)?)
+    }
+
+    /// Check the Health Status of the Auth Server
+    /// # Example
+    /// ```
+    /// let health = auth_client
+    ///     .get_health()
+    ///     .await
+    ///     .unwrap();
+    /// ```
+    pub async fn get_health(&self) -> Result<AuthServerHealth, Error> {
+        let mut headers = HeaderMap::new();
+        headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
+
+        let response = self
+            .client
+            .get(&format!("{}/auth/v1/health", self.project_url))
+            .headers(headers)
+            .send()
+            .await?
+            .text()
+            .await?;
+
+        Ok(serde_json::from_str(&response)?)
+    }
+
+    /// Retrieve the public settings of the server
+    /// # Example
+    /// ```
+    /// let settings = auth_client
+    ///     .get_settings()
+    ///     .await
+    ///     .unwrap();
+    /// ```
+    pub async fn get_settings(&self) -> Result<AuthServerSettings, Error> {
+        let mut headers = HeaderMap::new();
+        headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
+
+        let response = self
+            .client
+            .get(&format!("{}/auth/v1/settings", self.project_url))
+            .headers(headers)
             .send()
             .await?
             .text()

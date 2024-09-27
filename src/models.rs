@@ -327,6 +327,57 @@ impl Display for Channel {
     }
 }
 
+/// Health status of the Auth Server
+#[derive(Debug, Serialize, Deserialize)]
+pub struct AuthServerHealth {
+    /// Version of the service
+    pub version: String,
+    /// Name of the service
+    pub name: String,
+    /// Description of the service
+    pub description: String,
+}
+
+/// Settings of the Auth Server
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct AuthServerSettings {
+    pub external: External,
+    pub disable_signup: bool,
+    pub mailer_autoconfirm: bool,
+    pub phone_autoconfirm: bool,
+    pub sms_provider: String,
+    pub saml_enabled: bool,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct External {
+    pub anonymous_users: bool,
+    pub apple: bool,
+    pub azure: bool,
+    pub bitbucket: bool,
+    pub discord: bool,
+    pub facebook: bool,
+    pub figma: bool,
+    pub fly: bool,
+    pub github: bool,
+    pub gitlab: bool,
+    pub google: bool,
+    pub keycloak: bool,
+    pub kakao: bool,
+    pub linkedin: bool,
+    pub linkedin_oidc: bool,
+    pub notion: bool,
+    pub spotify: bool,
+    pub slack: bool,
+    pub slack_oidc: bool,
+    pub workos: bool,
+    pub twitch: bool,
+    pub twitter: bool,
+    pub email: bool,
+    pub phone: bool,
+    pub zoom: bool,
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub enum Provider {
     Apple,

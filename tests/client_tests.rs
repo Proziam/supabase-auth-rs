@@ -350,3 +350,21 @@ async fn resend_email_test() {
 
     assert!(response.is_ok() && session.unwrap().user.email == demo_email)
 }
+
+#[tokio::test]
+async fn get_settings_test() {
+    let auth_client = create_test_client();
+
+    let settings = auth_client.get_settings().await.unwrap();
+
+    assert!(settings.external.github == true)
+}
+
+#[tokio::test]
+async fn get_health_test() {
+    let auth_client = create_test_client();
+
+    let health = auth_client.get_health().await.unwrap();
+
+    assert!(health.description != "")
+}
