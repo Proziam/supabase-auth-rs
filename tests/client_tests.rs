@@ -1,7 +1,8 @@
 use std::{collections::HashMap, env};
 
 use supabase_auth::models::{
-    AuthClient, DesktopResendParams, ResendParams, SignInWithOAuthOptions, UpdateUserPayload,
+    AuthClient, DesktopResendParams, LogoutScope, ResendParams, SignInWithOAuthOptions,
+    UpdateUserPayload,
 };
 
 fn create_test_client() -> AuthClient {
@@ -349,6 +350,26 @@ async fn resend_email_test() {
     let response = auth_client.resend(ResendParams::Desktop(credentials)).await;
 
     assert!(response.is_ok() && session.unwrap().user.email == demo_email)
+}
+
+#[tokio::test]
+async fn logout_test() {
+    let auth_client = create_test_client();
+
+    let demo_email = env::var("DEMO_EMAIL").unwrap();
+    let demo_password = "qwerqwer";
+
+    let session = auth_client
+        .sign_in_with_email_and_password(demo_email, demo_password.to_string())
+        .await
+        .unwrap();
+
+    let logout = auth_client
+        .logout(Some(LogoutScope::Global), session.access_token)
+        .await
+        .unwrap();
+
+    assert!(logout.status().is_success())
 }
 
 #[tokio::test]

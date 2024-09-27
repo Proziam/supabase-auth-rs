@@ -6,16 +6,17 @@ use reqwest::{
     header::{self, HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE},
     Client, Response,
 };
+use serde::Serialize;
 
 use crate::{
     error::Error,
     models::{
-        AuthClient, AuthServerHealth, AuthServerSettings, Provider, RefreshSessionPayload,
-        RequestMagicLinkPayload, ResendParams, ResetPasswordForEmailPayload, Session,
-        SignInEmailOtpParams, SignInWithEmailAndPasswordPayload, SignInWithEmailOtpPayload,
-        SignInWithIdTokenCredentials, SignInWithOAuthOptions, SignInWithPhoneAndPasswordPayload,
-        SignUpWithEmailAndPasswordPayload, SignUpWithPhoneAndPasswordPayload, UpdateUserPayload,
-        User, VerifyOtpParams,
+        AuthClient, AuthServerHealth, AuthServerSettings, LogoutScope, Provider,
+        RefreshSessionPayload, RequestMagicLinkPayload, ResendParams, ResetPasswordForEmailPayload,
+        Session, SignInEmailOtpParams, SignInWithEmailAndPasswordPayload,
+        SignInWithEmailOtpPayload, SignInWithIdTokenCredentials, SignInWithOAuthOptions,
+        SignInWithPhoneAndPasswordPayload, SignUpWithEmailAndPasswordPayload,
+        SignUpWithPhoneAndPasswordPayload, UpdateUserPayload, User, VerifyOtpParams,
     },
 };
 
@@ -645,6 +646,37 @@ impl AuthClient {
             .await?;
 
         Ok(())
+    }
+
+    /// Logs out a user with a given scope
+    /// # Example
+    /// ```
+    /// auth_client.logout(Some(LogoutScope::Global), session.access_token).await.unwrap();
+    /// ```
+    pub async fn logout<S: Into<String>>(
+        &self,
+        scope: Option<LogoutScope>,
+        bearer_token: S,
+    ) -> Result<Response, Error> {
+        let mut headers = HeaderMap::new();
+        headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
+        headers.insert(CONTENT_TYPE, HeaderValue::from_str("application/json")?);
+        headers.insert(
+            AUTHORIZATION,
+            HeaderValue::from_str(&format!("Bearer {}", &bearer_token.into()))?,
+        );
+
+        let body = serde_json::to_string(&scope)?;
+
+        let response = self
+            .client
+            .post(&format!("{}/auth/v1/logout", self.project_url))
+            .headers(headers)
+            .body(body)
+            .send()
+            .await?;
+
+        Ok(response)
     }
 
     /// Get the project URL from an AuthClient

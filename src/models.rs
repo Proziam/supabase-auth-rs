@@ -433,6 +433,15 @@ impl Display for Provider {
     }
 }
 
+/// Represents the scope of the logout operation
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum LogoutScope {
+    Global,
+    Local,
+    Others,
+}
+
 // Implement custom Debug to avoid exposing sensitive information
 impl fmt::Debug for AuthClient {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
