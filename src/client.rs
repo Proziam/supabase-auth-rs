@@ -4,18 +4,17 @@ use std::env;
 
 use reqwest::{
     header::{self, HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE},
-    Client, Response,
+    Client, Response, StatusCode,
 };
-use serde::Serialize;
 
 use crate::{
-    error::Error,
+    error::{Error, SupabaseHTTPError},
     models::{
         AuthClient, AuthServerHealth, AuthServerSettings, LogoutScope, Provider,
         RefreshSessionPayload, RequestMagicLinkPayload, ResendParams, ResetPasswordForEmailPayload,
-        Session, SignInEmailOtpParams, SignInWithEmailAndPasswordPayload,
+        SSOResponse, Session, SignInEmailOtpParams, SignInWithEmailAndPasswordPayload,
         SignInWithEmailOtpPayload, SignInWithIdTokenCredentials, SignInWithOAuthOptions,
-        SignInWithPhoneAndPasswordPayload, SignUpWithEmailAndPasswordPayload,
+        SignInWithPhoneAndPasswordPayload, SignInWithSSO, SignUpWithEmailAndPasswordPayload,
         SignUpWithPhoneAndPasswordPayload, UpdateUserPayload, User, VerifyOtpParams,
     },
 };
@@ -78,7 +77,7 @@ impl AuthClient {
         };
 
         let mut headers = header::HeaderMap::new();
-        headers.insert(CONTENT_TYPE, HeaderValue::from_str("application/json")?);
+        headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
         headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
         let body = serde_json::to_string(&payload)?;
 
@@ -96,6 +95,44 @@ impl AuthClient {
             .await?;
 
         Ok(serde_json::from_str(&response)?)
+    }
+
+    pub async fn login_with_email<S: Into<String>>(
+        &self,
+        email: S,
+        password: S,
+    ) -> Result<Session, Error> {
+        let payload = SignInWithEmailAndPasswordPayload {
+            email: email.into(),
+            password: password.into(),
+        };
+
+        let mut headers = header::HeaderMap::new();
+        headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
+        headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
+        let body = serde_json::to_string(&payload)?;
+
+        let response = self
+            .client
+            .post(format!(
+                "{}/auth/v1/token?grant_type=password",
+                self.project_url
+            ))
+            .headers(headers)
+            .body(body)
+            .send()
+            .await?;
+
+        match response.status() {
+            StatusCode::OK => {
+                let session: Session = serde_json::from_str(&response.text().await?)?;
+                Ok(session)
+            }
+            _ => {
+                let error: SupabaseHTTPError = serde_json::from_str(&response.text().await?)?;
+                Err(Error::Supabase(error))
+            }
+        }
     }
 
     /// Sign in a user with phone number and password

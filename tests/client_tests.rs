@@ -17,7 +17,7 @@ async fn create_client_test_valid() {
 }
 
 #[tokio::test]
-async fn sign_in_with_password_test_valid() {
+async fn test_login_with_email() {
     let auth_client = create_test_client();
 
     let demo_email = env::var("DEMO_EMAIL").unwrap();
@@ -32,7 +32,7 @@ async fn sign_in_with_password_test_valid() {
 }
 
 #[tokio::test]
-async fn sign_in_with_password_test_invalid() {
+async fn test_login_with_email_invalid() {
     let auth_client = create_test_client();
 
     let demo_email = "invalid@demo.com";
