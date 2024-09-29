@@ -60,43 +60,12 @@ impl AuthClient {
     /// # Example
     /// ```
     /// let session = auth_client
-    ///     .sign_in_with_email_and_password(demo_email, demo_password)
+    ///     .login_with_email(demo_email, demo_password)
     ///     .await
     ///     .unwrap();
     ///
     /// assert!(session.user.email == demo_email)
     /// ```
-    pub async fn sign_in_with_email_and_password<S: Into<String>>(
-        &self,
-        email: S,
-        password: S,
-    ) -> Result<Session, Error> {
-        let payload = SignInWithEmailAndPasswordPayload {
-            email: email.into(),
-            password: password.into(),
-        };
-
-        let mut headers = header::HeaderMap::new();
-        headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
-        headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
-        let body = serde_json::to_string(&payload)?;
-
-        let response = self
-            .client
-            .post(format!(
-                "{}/auth/v1/token?grant_type=password",
-                self.project_url
-            ))
-            .headers(headers)
-            .body(body)
-            .send()
-            .await?
-            .text()
-            .await?;
-
-        Ok(serde_json::from_str(&response)?)
-    }
-
     pub async fn login_with_email<S: Into<String>>(
         &self,
         email: S,
