@@ -24,6 +24,9 @@ jobs:
       SUPABASE_API_KEY: ${{ secrets.SUPABASE_API_KEY }}
       SUPABASE_JWT_SECRET: ${{ secrets.SUPABASE_JWT_SECRET }}
       DEMO_EMAIL: ${{ secrets.DEMO_EMAIL}}
+      DEMO_PHONE: ${{ secrets.DEMO_PHONE}}
+      DEMO_PASSWORD: ${{ secrets.DEMO_PASSWORD}}
+
 
     steps:
     - uses: actions/checkout@v4
