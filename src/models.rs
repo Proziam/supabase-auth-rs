@@ -469,6 +469,54 @@ pub struct SSOSuccess {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct Headers {
+    pub date: String,
+    #[serde(rename = "content-type")]
+    pub content_type: String,
+    #[serde(rename = "transfer-encoding")]
+    pub transfer_encoding: String,
+    pub connection: String,
+    pub server: String,
+    pub vary: String,
+    #[serde(rename = "x-okta-request-id")]
+    pub x_okta_request_id: String,
+    #[serde(rename = "x-xss-protection")]
+    pub x_xss_protection: String,
+    pub p3p: String,
+    #[serde(rename = "set-cookie")]
+    pub set_cookie: Vec<String>,
+    #[serde(rename = "content-security-policy-report-only")]
+    pub content_security_policy_report_only: String,
+    #[serde(rename = "content-security-policy")]
+    pub content_security_policy: String,
+    #[serde(rename = "x-rate-limit-limit")]
+    pub x_rate_limit_limit: String,
+    #[serde(rename = "x-rate-limit-remaining")]
+    pub x_rate_limit_remaining: String,
+    #[serde(rename = "x-rate-limit-reset")]
+    pub x_rate_limit_reset: String,
+    #[serde(rename = "referrer-policy")]
+    pub referrer_policy: String,
+    #[serde(rename = "accept-ch")]
+    pub accept_ch: String,
+    #[serde(rename = "cache-control")]
+    pub cache_control: String,
+    pub pragma: String,
+    pub expires: String,
+    #[serde(rename = "x-frame-options")]
+    pub x_frame_options: String,
+    #[serde(rename = "x-content-type-options")]
+    pub x_content_type_options: String,
+    #[serde(rename = "x-ua-compatible")]
+    pub x_ua_compatible: String,
+    #[serde(rename = "content-language")]
+    pub content_language: String,
+    #[serde(rename = "strict-transport-security")]
+    pub strict_transport_security: String,
+    #[serde(rename = "x-robots-tag")]
+    pub x_robots_tag: String,
+}
+
 // Implement custom Debug to avoid exposing sensitive information
 impl fmt::Debug for AuthClient {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
