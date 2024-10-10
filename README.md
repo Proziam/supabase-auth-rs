@@ -38,6 +38,7 @@ Any features which are currently deprecated in the [JS client](https://github.co
 - [x] Retrieve User
 - [x] Reset Password
 - [x] Change User Data (e.g., Email or password)
+- [ ] SSO
 
 ## Contributions
 
