@@ -12,12 +12,14 @@ use crate::{
     models::{
         AuthClient, AuthServerHealth, AuthServerSettings, LogoutScope, Provider,
         RefreshSessionPayload, RequestMagicLinkPayload, ResendParams, ResetPasswordForEmailPayload,
-        SSOResponse, Session, SignInEmailOtpParams, SignInWithEmailAndPasswordPayload,
+        Session, SignInEmailOtpParams, SignInWithEmailAndPasswordPayload,
         SignInWithEmailOtpPayload, SignInWithIdTokenCredentials, SignInWithOAuthOptions,
         SignInWithPhoneAndPasswordPayload, SignInWithSSO, SignUpWithEmailAndPasswordPayload,
         SignUpWithPhoneAndPasswordPayload, UpdateUserPayload, User, VerifyOtpParams,
     },
 };
+
+const AUTH_V1: &str = "/auth/v1";
 
 impl AuthClient {
     /// Create a new Auth Client
@@ -84,8 +86,8 @@ impl AuthClient {
         let response = self
             .client
             .post(format!(
-                "{}/auth/v1/token?grant_type=password",
-                self.project_url
+                "{}{}/token?grant_type=password",
+                self.project_url, AUTH_V1
             ))
             .headers(headers)
             .body(body)
@@ -685,6 +687,7 @@ impl AuthClient {
         Ok(response)
     }
 
+    // WARN: Untested, requires a SAML 2.0 Provider and Supabase Pro plan
     /// Get the project URL from an AuthClient
     pub fn project_url(&self) -> &String {
         &self.project_url

@@ -1,8 +1,8 @@
 use std::{collections::HashMap, env};
 
 use supabase_auth::models::{
-    AuthClient, DesktopResendParams, LogoutScope, ResendParams, SignInWithOAuthOptions,
-    UpdateUserPayload,
+    AuthClient, DesktopResendParams, LogoutScope, ResendParams, SSOSignInOptions, SSOSuccess,
+    SignInWithOAuthOptions, SignInWithSSO, UpdateUserPayload,
 };
 
 fn create_test_client() -> AuthClient {
@@ -24,7 +24,7 @@ async fn test_login_with_email() {
     let demo_password = "qwerqwer";
 
     let session = auth_client
-        .sign_in_with_email_and_password(demo_email.as_ref(), demo_password)
+        .login_with_email(demo_email.as_ref(), demo_password)
         .await
         .unwrap();
 
@@ -39,7 +39,7 @@ async fn test_login_with_email_invalid() {
     let demo_password = "invalid";
 
     let session = auth_client
-        .sign_in_with_email_and_password(demo_email, demo_password)
+        .login_with_email(demo_email, demo_password)
         .await;
 
     assert!(session.is_err())
@@ -147,7 +147,7 @@ async fn sign_in_with_oauth_test() {
     let demo_password = "qwerqwer";
 
     let session = auth_client
-        .sign_in_with_email_and_password(demo_email.as_ref(), demo_password)
+        .login_with_email(demo_email.as_ref(), demo_password)
         .await;
 
     if session.is_err() {
@@ -185,7 +185,7 @@ async fn sign_in_with_oauth_no_options_test() {
     let demo_password = "qwerqwer";
 
     let session = auth_client
-        .sign_in_with_email_and_password(demo_email.as_ref(), demo_password)
+        .login_with_email(demo_email.as_ref(), demo_password)
         .await;
 
     if session.is_err() {
@@ -217,7 +217,7 @@ async fn get_user_test() {
     let demo_password = "qwerqwer";
 
     let session = auth_client
-        .sign_in_with_email_and_password(demo_email.as_ref(), demo_password)
+        .login_with_email(demo_email.as_ref(), demo_password)
         .await;
 
     if session.is_err() {
@@ -241,7 +241,7 @@ async fn update_user_test() {
     let demo_password = "qwerqwer";
 
     let session = auth_client
-        .sign_in_with_email_and_password(demo_email.as_ref(), demo_password)
+        .login_with_email(demo_email.as_ref(), demo_password)
         .await;
 
     if session.is_err() {
@@ -266,7 +266,7 @@ async fn update_user_test() {
     let test_password = "qqqqwwww";
 
     let new_session = auth_client
-        .sign_in_with_email_and_password(demo_email.as_ref(), test_password)
+        .login_with_email(demo_email.as_ref(), test_password)
         .await;
 
     if new_session.is_err() {
@@ -295,7 +295,7 @@ async fn exchange_token_for_session() {
     let demo_password = "qwerqwer";
 
     let original_session = auth_client
-        .sign_in_with_email_and_password(demo_email.as_ref(), demo_password)
+        .login_with_email(demo_email.as_ref(), demo_password)
         .await
         .unwrap();
 
@@ -360,7 +360,7 @@ async fn logout_test() {
     let demo_password = "qwerqwer";
 
     let session = auth_client
-        .sign_in_with_email_and_password(demo_email, demo_password.to_string())
+        .login_with_email(demo_email, demo_password.to_string())
         .await
         .unwrap();
 

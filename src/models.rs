@@ -442,6 +442,33 @@ pub enum LogoutScope {
     Others,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SignInWithSSO {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub provider_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub domain: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub options: Option<SSOSignInOptions>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SSOSignInOptions {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    captcha_token: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    redirect_to: Option<String>,
+}
+
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SSOSuccess {
+    pub url: String,
+    pub status: u16,
+    pub headers: Headers,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 // Implement custom Debug to avoid exposing sensitive information
 impl fmt::Debug for AuthClient {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
