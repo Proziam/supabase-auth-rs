@@ -3,6 +3,7 @@ use std::{
     fmt::{self, Display},
 };
 
+use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -32,6 +33,8 @@ pub enum Error {
     InvalidEnvironmentVariable(#[from] env::VarError),
     #[error("{0}")]
     Supabase(SupabaseHTTPError),
+    #[error("Error: {status}: {message}")]
+    AuthError { status: StatusCode, message: String },
 }
 
 #[derive(Debug, Serialize, Deserialize)]
