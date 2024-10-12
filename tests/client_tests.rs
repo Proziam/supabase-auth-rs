@@ -46,21 +46,6 @@ async fn test_login_with_email_invalid() {
 }
 
 #[tokio::test]
-async fn sign_in_with_phone_and_password_test() {
-    let auth_client = create_test_client();
-
-    let demo_phone = env::var("DEMO_PHONE").unwrap();
-    let demo_password = env::var("DEMO_PASSWORD").unwrap();
-
-    let session = auth_client
-        .sign_in_with_phone_and_password(&demo_phone, &demo_password)
-        .await
-        .unwrap();
-
-    assert!(session.user.phone == demo_phone)
-}
-
-#[tokio::test]
 async fn sign_up_with_email_test_valid() {
     let auth_client = create_test_client();
 
@@ -78,21 +63,30 @@ async fn sign_up_with_email_test_valid() {
 }
 
 #[tokio::test]
-async fn sign_up_with_phone_test_valid() {
+async fn test_mobile_flow() {
     let auth_client = create_test_client();
 
     let demo_phone = env::var("DEMO_PHONE").unwrap();
-    let demo_password = "ciJUAojfZZYKfCxkiUWH";
+    let demo_password = env::var("DEMO_PASSWORD").unwrap();
 
     let session = auth_client
-        .sign_up_with_phone_and_password(demo_phone.as_ref(), demo_password)
+        .sign_up_with_phone_and_password(demo_phone.clone(), demo_password.clone())
+        .await
+        .unwrap();
+
+    let new_session = auth_client
+        .sign_in_with_phone_and_password(&demo_phone, &demo_password)
         .await;
 
-    if session.is_err() {
-        eprintln!("{:?}", session.as_ref().unwrap_err())
+    assert!(new_session.is_ok() && new_session.unwrap().user.phone == demo_phone);
+
+    let response = auth_client.send_sms_with_otp(demo_phone).await;
+
+    if response.is_err() {
+        eprintln!("{:?}", response.as_ref().unwrap_err())
     }
 
-    assert!(session.is_ok() && session.unwrap().user.phone == demo_phone)
+    assert!(response.is_ok())
 }
 
 #[tokio::test]
