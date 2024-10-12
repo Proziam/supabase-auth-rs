@@ -154,6 +154,17 @@ pub struct UpdateUserPayload {
     pub data: Option<serde_json::Value>,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SendSMSOtpPayload {
+    pub phone: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct OTPResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub message_id: Option<String>,
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub enum VerifyOtpParams {
     Mobile(VerifyMobileOtpParams),
