@@ -4,8 +4,9 @@ use std::env;
 
 use reqwest::{
     header::{self, HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE},
-    Client, Response, StatusCode,
+    Body, Client, Response, StatusCode, Url,
 };
+use serde_json::from_str;
 
 use crate::{
     error::{Error, SupabaseHTTPError},
@@ -94,16 +95,15 @@ impl AuthClient {
             .send()
             .await?;
 
-        match response.status() {
-            StatusCode::OK => {
-                let session: Session = serde_json::from_str(&response.text().await?)?;
-                Ok(session)
-            }
-            _ => {
-                let error: SupabaseHTTPError = serde_json::from_str(&response.text().await?)?;
-                Err(Error::Supabase(error))
-            }
-        }
+        let res_status = response.status();
+        let res_body = response.text().await?;
+
+        let session: Session = from_str(&res_body).map_err(|_| crate::error::Error::AuthError {
+            status: res_status,
+            message: res_body,
+        })?;
+
+        Ok(session)
     }
 
     /// Sign in a user with phone number and password
@@ -145,7 +145,7 @@ impl AuthClient {
             .text()
             .await?;
 
-        Ok(serde_json::from_str(&response)?)
+        Ok(from_str(&response)?)
     }
 
     /// Sign up a new user with an email and password
@@ -184,7 +184,7 @@ impl AuthClient {
             .text()
             .await?;
 
-        Ok(serde_json::from_str::<Session>(&response)?)
+        Ok(from_str::<Session>(&response)?)
     }
 
     /// Sign up a new user with an email and password
@@ -223,7 +223,7 @@ impl AuthClient {
             .text()
             .await?;
 
-        Ok(serde_json::from_str::<Session>(&response)?)
+        Ok(from_str::<Session>(&response)?)
     }
 
     /// Sends a login email containing a magic link
@@ -386,7 +386,7 @@ impl AuthClient {
             .text()
             .await?;
 
-        Ok(serde_json::from_str(&user)?)
+        Ok(from_str(&user)?)
     }
 
     /// Update the user, such as changing email or password. Each field (email, password, and data) is optional
@@ -428,7 +428,7 @@ impl AuthClient {
             .text()
             .await?;
 
-        Ok(serde_json::from_str(&response)?)
+        Ok(from_str(&response)?)
     }
 
     // TODO: Add test
@@ -456,7 +456,7 @@ impl AuthClient {
             .text()
             .await?;
 
-        Ok(serde_json::from_str(&response)?)
+        Ok(from_str(&response)?)
     }
 
     // TODO: Add test
@@ -478,7 +478,7 @@ impl AuthClient {
             .text()
             .await?;
 
-        Ok(serde_json::from_str(&response)?)
+        Ok(from_str(&response)?)
     }
 
     // TODO: Add test
@@ -499,7 +499,7 @@ impl AuthClient {
             .text()
             .await?;
 
-        Ok(serde_json::from_str(&response)?)
+        Ok(from_str(&response)?)
     }
 
     /// Check the Health Status of the Auth Server
@@ -523,7 +523,7 @@ impl AuthClient {
             .text()
             .await?;
 
-        Ok(serde_json::from_str(&response)?)
+        Ok(from_str(&response)?)
     }
 
     /// Retrieve the public settings of the server
@@ -547,7 +547,7 @@ impl AuthClient {
             .text()
             .await?;
 
-        Ok(serde_json::from_str(&response)?)
+        Ok(from_str(&response)?)
     }
 
     /// Exchange refresh token for a new session
@@ -590,7 +590,7 @@ impl AuthClient {
             .text()
             .await?;
 
-        Ok(serde_json::from_str(&response)?)
+        Ok(from_str(&response)?)
     }
 
     pub async fn refresh_session(&self, refresh_token: String) -> Result<Session, Error> {
