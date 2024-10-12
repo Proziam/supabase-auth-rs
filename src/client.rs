@@ -4,16 +4,16 @@ use std::env;
 
 use reqwest::{
     header::{self, HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE},
-    Body, Client, Response, StatusCode, Url,
+    Client, Response, Url,
 };
 use serde_json::from_str;
 
 use crate::{
-    error::{Error, SupabaseHTTPError},
+    error::Error,
     models::{
-        AuthClient, AuthServerHealth, AuthServerSettings, LogoutScope, Provider,
+        AuthClient, AuthServerHealth, AuthServerSettings, LogoutScope, OTPResponse, Provider,
         RefreshSessionPayload, RequestMagicLinkPayload, ResendParams, ResetPasswordForEmailPayload,
-        Session, SignInEmailOtpParams, SignInWithEmailAndPasswordPayload,
+        SendSMSOtpPayload, Session, SignInEmailOtpParams, SignInWithEmailAndPasswordPayload,
         SignInWithEmailOtpPayload, SignInWithIdTokenCredentials, SignInWithOAuthOptions,
         SignInWithPhoneAndPasswordPayload, SignInWithSSO, SignUpWithEmailAndPasswordPayload,
         SignUpWithPhoneAndPasswordPayload, UpdateUserPayload, User, VerifyOtpParams,
@@ -25,6 +25,10 @@ const AUTH_V1: &str = "/auth/v1";
 impl AuthClient {
     /// Create a new Auth Client
     /// You can find your project url and keys at https://supabase.com/dashboard/project/<your project id>/settings/api
+    /// # Example
+    /// ```
+    /// let auth_client = AuthClient::new(project_url, api_key, jwt_secret).unwrap();
+    /// ```
     pub fn new(
         project_url: impl Into<String>,
         api_key: impl Into<String>,
@@ -135,17 +139,23 @@ impl AuthClient {
         let response = self
             .client
             .post(format!(
-                "{}/auth/v1/token?grant_type=password",
-                self.project_url
+                "{}{}/token?grant_type=password",
+                self.project_url, AUTH_V1
             ))
             .headers(headers)
             .body(body)
             .send()
-            .await?
-            .text()
             .await?;
 
-        Ok(from_str(&response)?)
+        let res_status = response.status();
+        let res_body = response.text().await?;
+
+        let session: Session = from_str(&res_body).map_err(|_| crate::error::Error::AuthError {
+            status: res_status,
+            message: res_body,
+        })?;
+
+        Ok(session)
     }
 
     /// Sign up a new user with an email and password
@@ -176,15 +186,21 @@ impl AuthClient {
 
         let response = self
             .client
-            .post(format!("{}/auth/v1/signup", self.project_url))
+            .post(format!("{}{}/signup", self.project_url, AUTH_V1))
             .headers(headers)
             .body(body)
             .send()
-            .await?
-            .text()
             .await?;
 
-        Ok(from_str::<Session>(&response)?)
+        let res_status = response.status();
+        let res_body = response.text().await?;
+
+        let session: Session = from_str(&res_body).map_err(|_| crate::error::Error::AuthError {
+            status: res_status,
+            message: res_body,
+        })?;
+
+        Ok(session)
     }
 
     /// Sign up a new user with an email and password
@@ -215,15 +231,21 @@ impl AuthClient {
 
         let response = self
             .client
-            .post(format!("{}/auth/v1/signup", self.project_url))
+            .post(format!("{}{}/signup", self.project_url, AUTH_V1))
             .headers(headers)
             .body(body)
             .send()
-            .await?
-            .text()
             .await?;
 
-        Ok(from_str::<Session>(&response)?)
+        let res_status = response.status();
+        let res_body = response.text().await?;
+
+        let session: Session = from_str(&res_body).map_err(|_| crate::error::Error::AuthError {
+            status: res_status,
+            message: res_body,
+        })?;
+
+        Ok(session)
     }
 
     /// Sends a login email containing a magic link
@@ -237,7 +259,7 @@ impl AuthClient {
     pub async fn send_login_email_with_magic_link<S: Into<String>>(
         &self,
         email: S,
-    ) -> Result<Response, Error> {
+    ) -> Result<(), Error> {
         let payload = RequestMagicLinkPayload {
             email: email.into(),
         };
@@ -250,22 +272,37 @@ impl AuthClient {
 
         let response = self
             .client
-            .post(format!("{}/auth/v1/magiclink", self.project_url))
+            .post(format!("{}{}/magiclink", self.project_url, AUTH_V1))
             .headers(headers)
             .body(body)
             .send()
             .await?;
 
-        Ok(response)
+        let res_status = response.status();
+        let res_body = response.text().await?;
+
+        if res_status.is_success() {
+            Ok(())
+        } else {
+            Err(crate::error::Error::AuthError {
+                status: res_status,
+                message: res_body,
+            })
+        }
     }
 
+    // TODO: Fix Return Type https://supabase.com/docs/reference/javascript/auth-signinwithotp
+
     /// Send a Login OTP via SMS
+    ///
     /// # Example
     /// ```
     /// let response = auth_client.send_sms_with_otp(demo_phone).await;
     /// ```
-    pub async fn send_sms_with_otp<S: Into<String>>(&self, phone: S) -> Result<Response, Error> {
-        let payload = phone.into();
+    pub async fn send_sms_with_otp<S: Into<String>>(&self, phone: S) -> Result<OTPResponse, Error> {
+        let payload = SendSMSOtpPayload {
+            phone: phone.into(),
+        };
 
         let mut headers = header::HeaderMap::new();
         headers.insert(CONTENT_TYPE, HeaderValue::from_str("application/json")?);
@@ -275,16 +312,29 @@ impl AuthClient {
 
         let response = self
             .client
-            .post(format!("{}/auth/v1/otp", self.project_url))
+            .post(format!("{}{}/otp", self.project_url, AUTH_V1))
             .headers(headers)
             .body(body)
             .send()
             .await?;
 
-        Ok(response)
+        let res_status = response.status();
+        let res_body = response.text().await?;
+
+        if res_status.is_success() {
+            let message = serde_json::from_str(&res_body)?;
+            Ok(message)
+        } else {
+            Err(crate::error::Error::AuthError {
+                status: res_status,
+                message: res_body,
+            })
+        }
     }
 
     /// Send a Login OTP via email
+    ///
+    /// Returns an OTPResponse on success
     /// # Example
     /// ```
     /// let send = auth_client.send_sms_with_otp(demo_phone).await.unwrap();
@@ -293,7 +343,7 @@ impl AuthClient {
         &self,
         email: S,
         options: Option<SignInEmailOtpParams>,
-    ) -> Result<Response, Error> {
+    ) -> Result<OTPResponse, Error> {
         let payload = SignInWithEmailOtpPayload {
             email: email.into(),
             options,
@@ -307,13 +357,24 @@ impl AuthClient {
 
         let response = self
             .client
-            .post(format!("{}/auth/v1/otp", self.project_url))
+            .post(format!("{}{}/otp", self.project_url, AUTH_V1))
             .headers(headers)
             .body(body)
             .send()
             .await?;
 
-        Ok(response)
+        let res_status = response.status();
+        let res_body = response.text().await?;
+
+        if res_status.is_success() {
+            let message = serde_json::from_str(&res_body)?;
+            Ok(message)
+        } else {
+            Err(crate::error::Error::AuthError {
+                status: res_status,
+                message: res_body,
+            })
+        }
     }
 
     /// Sign in a user using an OAuth provider.
@@ -349,8 +410,9 @@ impl AuthClient {
         let response = self
             .client
             .get(format!(
-                "{}/auth/v1/authorize?provider={}",
+                "{}{}/authorize?provider={}",
                 self.project_url,
+                AUTH_V1,
                 provider.to_string()
             ))
             .headers(headers)
@@ -374,12 +436,14 @@ impl AuthClient {
     pub async fn get_user<S: Into<String>>(&self, bearer_token: S) -> Result<User, Error> {
         let mut headers = header::HeaderMap::new();
         headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
-        let token = format!("Bearer {}", &bearer_token.into());
-        headers.insert(AUTHORIZATION, HeaderValue::from_str(&token)?);
+        headers.insert(
+            AUTHORIZATION,
+            HeaderValue::from_str(&format!("Bearer {}", &bearer_token.into()))?,
+        );
 
         let user = self
             .client
-            .get(format!("{}/auth/v1/user", self.project_url))
+            .get(format!("{}{}/user", self.project_url, AUTH_V1))
             .headers(headers)
             .send()
             .await?
@@ -420,7 +484,7 @@ impl AuthClient {
 
         let response = self
             .client
-            .put(format!("{}/auth/v1/user", self.project_url))
+            .put(format!("{}{}/user", self.project_url, AUTH_V1))
             .headers(headers)
             .body(body)
             .send()
@@ -446,8 +510,8 @@ impl AuthClient {
         let response = self
             .client
             .post(format!(
-                "{}/auth/v1/token?grant_type=id_token",
-                self.project_url
+                "{}{}/token?grant_type=id_token",
+                self.project_url, AUTH_V1
             ))
             .headers(headers)
             .body(body)
@@ -470,7 +534,7 @@ impl AuthClient {
 
         let response = self
             .client
-            .post(format!("{}/auth/v1/invite", self.project_url))
+            .post(format!("{}{}/invite", self.project_url, AUTH_V1))
             .headers(headers)
             .body(body)
             .send()
@@ -491,7 +555,7 @@ impl AuthClient {
 
         let response = self
             .client
-            .post(&format!("{}/auth/v1/verify", self.project_url))
+            .post(&format!("{}{}/verify", self.project_url, AUTH_V1))
             .headers(headers)
             .body(body)
             .send()
@@ -516,7 +580,7 @@ impl AuthClient {
 
         let response = self
             .client
-            .get(&format!("{}/auth/v1/health", self.project_url))
+            .get(&format!("{}{}/health", self.project_url, AUTH_V1))
             .headers(headers)
             .send()
             .await?
@@ -540,7 +604,7 @@ impl AuthClient {
 
         let response = self
             .client
-            .get(&format!("{}/auth/v1/settings", self.project_url))
+            .get(&format!("{}{}/settings", self.project_url, AUTH_V1))
             .headers(headers)
             .send()
             .await?
@@ -580,8 +644,8 @@ impl AuthClient {
         let response = self
             .client
             .post(&format!(
-                "{}/auth/v1/token?grant_type=refresh_token",
-                self.project_url
+                "{}{}/token?grant_type=refresh_token",
+                self.project_url, AUTH_V1
             ))
             .headers(headers)
             .body(body)
@@ -617,7 +681,7 @@ impl AuthClient {
 
         let response = self
             .client
-            .post(&format!("{}/auth/v1/recover", self.project_url))
+            .post(&format!("{}{}/recover", self.project_url, AUTH_V1))
             .headers(headers)
             .body(body)
             .send()
@@ -647,7 +711,7 @@ impl AuthClient {
 
         let _response = self
             .client
-            .post(&format!("{}/auth/v1/resend", self.project_url))
+            .post(&format!("{}{}/resend", self.project_url, AUTH_V1))
             .headers(headers)
             .body(body)
             .send()
@@ -678,7 +742,7 @@ impl AuthClient {
 
         let response = self
             .client
-            .post(&format!("{}/auth/v1/logout", self.project_url))
+            .post(&format!("{}{}/logout", self.project_url, AUTH_V1))
             .headers(headers)
             .body(body)
             .send()
