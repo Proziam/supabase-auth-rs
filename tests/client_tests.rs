@@ -1,8 +1,8 @@
 use std::{collections::HashMap, env};
 
 use supabase_auth::models::{
-    AuthClient, DesktopResendParams, LogoutScope, ResendParams, SSOSignInOptions, SSOSuccess,
-    SignInWithOAuthOptions, SignInWithSSO, UpdateUserPayload,
+    AuthClient, DesktopResendParams, LogoutScope, ResendParams, SignInWithOAuthOptions,
+    SignInWithSSO, UpdateUserPayload,
 };
 
 fn create_test_client() -> AuthClient {
@@ -81,18 +81,18 @@ async fn sign_up_with_email_test_valid() {
 async fn sign_up_with_phone_test_valid() {
     let auth_client = create_test_client();
 
-    let demo_phone = "13334445555";
+    let demo_phone = env::var("DEMO_PHONE").unwrap();
     let demo_password = "ciJUAojfZZYKfCxkiUWH";
 
     let session = auth_client
-        .sign_up_with_phone_and_password(demo_phone, demo_password)
+        .sign_up_with_phone_and_password(demo_phone.as_ref(), demo_password)
         .await;
 
     if session.is_err() {
         eprintln!("{:?}", session.as_ref().unwrap_err())
     }
 
-    assert!(session.is_ok() && session.unwrap().user.phone == "13334445555")
+    assert!(session.is_ok() && session.unwrap().user.phone == demo_phone)
 }
 
 #[tokio::test]
@@ -127,7 +127,7 @@ async fn send_email_with_otp() {
 async fn send_sms_with_otp() {
     let auth_client = create_test_client();
 
-    let demo_phone = "1333444555";
+    let demo_phone = env::var("DEMO_PHONE").unwrap();
 
     let response = auth_client.send_sms_with_otp(demo_phone).await;
 
