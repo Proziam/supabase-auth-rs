@@ -688,6 +688,35 @@ impl AuthClient {
     }
 
     // WARN: Untested, requires a SAML 2.0 Provider and Supabase Pro plan
+    pub async fn sso(&self, params: SignInWithSSO) -> Result<Url, Error> {
+        let mut headers = HeaderMap::new();
+        headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
+        headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
+
+        let body = serde_json::to_string::<crate::models::SignInWithSSO>(&params)?;
+
+        let response = self
+            .client
+            .post(&format!("{}{}/sso", self.project_url, AUTH_V1))
+            .headers(headers)
+            .body(body)
+            .send()
+            .await?;
+
+        let res_status = response.status();
+        let url = response.url().clone();
+        let res_body = response.text().await?;
+
+        if res_status.is_server_error() || res_status.is_client_error() {
+            return Err(crate::error::Error::AuthError {
+                status: res_status,
+                message: res_body,
+            });
+        }
+
+        Ok(url)
+    }
+
     /// Get the project URL from an AuthClient
     pub fn project_url(&self) -> &String {
         &self.project_url

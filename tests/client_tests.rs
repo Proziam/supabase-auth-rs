@@ -374,6 +374,23 @@ async fn logout_test() {
 }
 
 #[tokio::test]
+async fn test_sso_login() {
+    let auth_client = create_test_client();
+    let demo_domain = env::var("DEMO_DOMAIN").unwrap();
+    let params = SignInWithSSO {
+        domain: Some(demo_domain),
+        options: None,
+        provider_id: None,
+    };
+
+    let ssoresponse = auth_client.sso(params).await.unwrap();
+
+    println!("{:?}", ssoresponse.to_string());
+
+    assert!(ssoresponse.to_string().len() > 1);
+}
+
+#[tokio::test]
 async fn get_settings_test() {
     let auth_client = create_test_client();
 
