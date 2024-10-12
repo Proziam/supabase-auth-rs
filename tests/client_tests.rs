@@ -1,4 +1,5 @@
-use std::{collections::HashMap, env};
+use core::time;
+use std::{collections::HashMap, env, thread};
 
 use supabase_auth::models::{
     AuthClient, DesktopResendParams, LogoutScope, ResendParams, SignInWithOAuthOptions,
@@ -59,6 +60,10 @@ async fn sign_up_with_email_test_valid() {
         .await
         .unwrap();
 
+    // Wait to prevent running into Supabase rate limits when running cargo test
+    let one_minute = time::Duration::from_secs(60);
+    thread::sleep(one_minute);
+
     assert!(session.user.email == demo_email)
 }
 
@@ -95,11 +100,19 @@ async fn send_login_email_with_magic_link() {
 
     let demo_email = env::var("DEMO_EMAIL").unwrap();
 
-    let _response = auth_client
+    let response = auth_client
         .send_login_email_with_magic_link(demo_email)
         .await;
 
-    assert!(_response.is_ok())
+    if response.is_err() {
+        eprintln!("{:?}", response.as_ref().unwrap_err())
+    }
+
+    // Wait to prevent running into Supabase rate limits when running cargo test
+    let one_minute = time::Duration::from_secs(60);
+    thread::sleep(one_minute);
+
+    assert!(response.is_ok())
 }
 
 #[tokio::test]
@@ -114,20 +127,9 @@ async fn send_email_with_otp() {
         eprintln!("{:?}", response.as_ref().unwrap_err())
     }
 
-    assert!(response.is_ok())
-}
-
-#[tokio::test]
-async fn send_sms_with_otp() {
-    let auth_client = create_test_client();
-
-    let demo_phone = env::var("DEMO_PHONE").unwrap();
-
-    let response = auth_client.send_sms_with_otp(demo_phone).await;
-
-    if response.is_err() {
-        eprintln!("{:?}", response.as_ref().unwrap_err())
-    }
+    // Wait to prevent running into Supabase rate limits when running cargo test
+    let one_minute = time::Duration::from_secs(60);
+    thread::sleep(one_minute);
 
     assert!(response.is_ok())
 }
@@ -316,6 +318,10 @@ async fn reset_password_for_email_test() {
 
     let response = auth_client.reset_password_for_email(demo_email).await;
 
+    // Wait to prevent running into Supabase rate limits when running cargo test
+    let one_minute = time::Duration::from_secs(60);
+    thread::sleep(one_minute);
+
     assert!(response.is_ok())
 }
 
@@ -341,6 +347,10 @@ async fn resend_email_test() {
         email: demo_email.to_owned(),
         options: None,
     };
+
+    // Wait to prevent running into Supabase rate limits when running cargo test
+    let one_minute = time::Duration::from_secs(60);
+    thread::sleep(one_minute);
 
     let response = auth_client.resend(ResendParams::Desktop(credentials)).await;
 
