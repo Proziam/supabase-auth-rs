@@ -687,7 +687,17 @@ impl AuthClient {
         Ok(response)
     }
 
-    // WARN: Untested, requires a SAML 2.0 Provider and Supabase Pro plan
+    /// Initiates an SSO Login Flow
+    /// Returns the URL where the user must authenticate with the SSO Provider
+    ///
+    /// WARNING: Requires an SSO Provider and Supabase Pro plan
+    ///
+    /// # Example
+    /// ```
+    /// let url = auth_client.sso(params).await.unwrap();
+    ///
+    /// println!("{}", url.to_string());
+    /// ```
     pub async fn sso(&self, params: SignInWithSSO) -> Result<Url, Error> {
         let mut headers = HeaderMap::new();
         headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));

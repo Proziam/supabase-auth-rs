@@ -383,11 +383,11 @@ async fn test_sso_login() {
         provider_id: None,
     };
 
-    let ssoresponse = auth_client.sso(params).await.unwrap();
+    let url = auth_client.sso(params).await.unwrap();
 
-    println!("{:?}", ssoresponse.to_string());
+    println!("{}", url.to_string());
 
-    assert!(ssoresponse.to_string().len() > 1);
+    assert!(url.to_string().len() > 1);
 }
 
 #[tokio::test]
