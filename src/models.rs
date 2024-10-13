@@ -1,3 +1,5 @@
+#![cfg(not(doctest))]
+
 use core::fmt;
 use reqwest::{Client, Url};
 use serde::{Deserialize, Serialize};
