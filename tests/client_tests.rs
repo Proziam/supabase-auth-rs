@@ -76,8 +76,13 @@ async fn test_mobile_flow() {
 
     let session = auth_client
         .sign_up_with_phone_and_password(demo_phone.clone(), demo_password.clone())
-        .await
-        .unwrap();
+        .await;
+
+    if session.is_err() {
+        eprintln!("{:?}", session.as_ref().unwrap_err())
+    }
+
+    assert!(session.is_ok());
 
     let new_session = auth_client
         .sign_in_with_phone_and_password(&demo_phone, &demo_password)
