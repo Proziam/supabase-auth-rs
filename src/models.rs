@@ -68,11 +68,16 @@ pub struct UserMetadata {
 }
 
 #[derive(Debug, Serialize)]
-pub struct SignInWithIdTokenCredentials {
+pub struct IdTokenCredentials {
+    /// Provider name or OIDC iss value identifying which provider should be used to verify the provided token.
     pub provider: Provider,
+    /// OIDC ID token issued by the specified provider. The iss claim in the ID token must match the supplied provider. Some ID tokens contain an at_hash which require that you provide an access_token value to be accepted properly. If the token contains a nonce claim you must supply the nonce used to obtain the ID token.
     pub token: String,
+    /// If the ID token contains an at_hash claim, then the hash of this value is compared to the value in the ID token.
     pub access_token: Option<String>,
+    /// If the ID token contains a nonce claim, then the hash of this value is compared to the value in the ID token.
     pub nonce: Option<String>,
+    /// Optional Object which may contain a captcha token
     pub gotrue_meta_security: Option<GotrueMetaSecurity>,
 }
 
@@ -86,6 +91,7 @@ pub struct SignInWithOAuthOptions {
 
 #[derive(Debug, Serialize)]
 pub struct GotrueMetaSecurity {
+    /// Verification token received when the user completes the captcha on the site.
     captcha_token: Option<String>,
 }
 
@@ -390,6 +396,13 @@ pub struct External {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+/// Currently enabled OAuth providers.
+///
+/// # Example
+/// ```
+/// let provider = Provider::Github.to_string();
+/// println!("{provider}") // "github"
+/// ```
 pub enum Provider {
     Apple,
     Azure,
