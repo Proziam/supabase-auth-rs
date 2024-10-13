@@ -400,7 +400,7 @@ impl AuthClient {
         &self,
         provider: Provider,
         options: Option<SignInWithOAuthOptions>,
-    ) -> Result<Response, Error> {
+    ) -> Result<OAuthResponse, Error> {
         let mut headers = header::HeaderMap::new();
         headers.insert(CONTENT_TYPE, HeaderValue::from_str("application/json")?);
         headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
@@ -420,7 +420,18 @@ impl AuthClient {
             .send()
             .await?;
 
-        Ok(response)
+        let res_status = response.status();
+        let url = response.url().to_owned();
+        let res_body = response.text().await?;
+
+        if res_status.is_success() {
+            Ok(OAuthResponse { url, provider })
+        } else {
+            Err(crate::error::Error::AuthError {
+                status: res_status,
+                message: res_body,
+            })
+        }
     }
 
     /// Return the signed in User
@@ -446,11 +457,19 @@ impl AuthClient {
             .get(format!("{}{}/user", self.project_url, AUTH_V1))
             .headers(headers)
             .send()
-            .await?
-            .text()
             .await?;
 
-        Ok(from_str(&user)?)
+        let res_status = user.status();
+        let res_body = user.text().await?;
+
+        if res_status.is_success() {
+            return Ok(serde_json::from_str(&res_body)?);
+        } else {
+            return Err(Error::AuthError {
+                status: res_status,
+                message: res_body,
+            });
+        }
     }
 
     /// Update the user, such as changing email or password. Each field (email, password, and data) is optional
@@ -482,24 +501,32 @@ impl AuthClient {
 
         let body = serde_json::to_string::<UpdateUserPayload>(&updated_user)?;
 
-        let response = self
+        let user = self
             .client
             .put(format!("{}{}/user", self.project_url, AUTH_V1))
             .headers(headers)
             .body(body)
             .send()
-            .await?
-            .text()
             .await?;
 
-        Ok(from_str(&response)?)
+        let res_status = user.status();
+        let res_body = user.text().await?;
+
+        if res_status.is_success() {
+            return Ok(serde_json::from_str(&res_body)?);
+        } else {
+            return Err(Error::AuthError {
+                status: res_status,
+                message: res_body,
+            });
+        }
     }
 
     // TODO: Add test
     /// Allows signing in with an OIDC ID token. The authentication provider used should be enabled and configured.
     pub async fn sign_in_with_id_token(
         &self,
-        credentials: SignInWithIdTokenCredentials,
+        credentials: IdTokenCredentials,
     ) -> Result<Session, Error> {
         let mut headers = HeaderMap::new();
         headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
@@ -507,7 +534,7 @@ impl AuthClient {
 
         let body = serde_json::to_string(&credentials)?;
 
-        let response = self
+        let session = self
             .client
             .post(format!(
                 "{}{}/token?grant_type=id_token",
@@ -516,11 +543,19 @@ impl AuthClient {
             .headers(headers)
             .body(body)
             .send()
-            .await?
-            .text()
             .await?;
 
-        Ok(from_str(&response)?)
+        let res_status = session.status();
+        let res_body = session.text().await?;
+
+        if res_status.is_success() {
+            return Ok(serde_json::from_str(&res_body)?);
+        } else {
+            return Err(Error::AuthError {
+                status: res_status,
+                message: res_body,
+            });
+        }
     }
 
     // TODO: Add test
@@ -532,17 +567,25 @@ impl AuthClient {
 
         let body = serde_json::to_string(&email.into())?;
 
-        let response = self
+        let user = self
             .client
             .post(format!("{}{}/invite", self.project_url, AUTH_V1))
             .headers(headers)
             .body(body)
             .send()
-            .await?
-            .text()
             .await?;
 
-        Ok(from_str(&response)?)
+        let res_status = user.status();
+        let res_body = user.text().await?;
+
+        if res_status.is_success() {
+            return Ok(serde_json::from_str(&res_body)?);
+        } else {
+            return Err(Error::AuthError {
+                status: res_status,
+                message: res_body,
+            });
+        }
     }
 
     // TODO: Add test
@@ -602,16 +645,24 @@ impl AuthClient {
         let mut headers = HeaderMap::new();
         headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
 
-        let response = self
+        let settings = self
             .client
             .get(&format!("{}{}/settings", self.project_url, AUTH_V1))
             .headers(headers)
             .send()
-            .await?
-            .text()
             .await?;
 
-        Ok(from_str(&response)?)
+        let res_status = settings.status();
+        let res_body = settings.text().await?;
+
+        if res_status.is_success() {
+            return Ok(serde_json::from_str(&res_body)?);
+        } else {
+            return Err(Error::AuthError {
+                status: res_status,
+                message: res_body,
+            });
+        }
     }
 
     /// Exchange refresh token for a new session
@@ -641,7 +692,7 @@ impl AuthClient {
             refresh_token: refresh_token.into(),
         })?;
 
-        let response = self
+        let session = self
             .client
             .post(&format!(
                 "{}{}/token?grant_type=refresh_token",
@@ -650,11 +701,19 @@ impl AuthClient {
             .headers(headers)
             .body(body)
             .send()
-            .await?
-            .text()
             .await?;
 
-        Ok(from_str(&response)?)
+        let res_status = session.status();
+        let res_body = session.text().await?;
+
+        if res_status.is_success() {
+            return Ok(serde_json::from_str(&res_body)?);
+        } else {
+            return Err(Error::AuthError {
+                status: res_status,
+                message: res_body,
+            });
+        }
     }
 
     pub async fn refresh_session(&self, refresh_token: String) -> Result<Session, Error> {
@@ -667,10 +726,7 @@ impl AuthClient {
     /// ```
     /// let response = auth_client.reset_password_for_email(demo_email).await.unwrap();
     /// ```
-    pub async fn reset_password_for_email<S: Into<String>>(
-        &self,
-        email: S,
-    ) -> Result<Response, Error> {
+    pub async fn reset_password_for_email<S: Into<String>>(&self, email: S) -> Result<(), Error> {
         let mut headers = HeaderMap::new();
         headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
         headers.insert(CONTENT_TYPE, HeaderValue::from_str("application/json")?);
@@ -687,7 +743,17 @@ impl AuthClient {
             .send()
             .await?;
 
-        Ok(response)
+        let res_status = response.status();
+        let res_body = response.text().await?;
+
+        if res_status.is_success() {
+            return Ok(());
+        } else {
+            return Err(Error::AuthError {
+                status: res_status,
+                message: res_body,
+            });
+        }
     }
 
     /// Resends emails for existing signup confirmation, email change, SMS OTP, or phone change OTP.
