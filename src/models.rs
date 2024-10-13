@@ -490,7 +490,6 @@ pub struct SSOSignInOptions {
     redirect_to: Option<String>,
 }
 
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SSOSuccess {
     pub url: String,

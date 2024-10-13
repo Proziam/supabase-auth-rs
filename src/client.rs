@@ -11,12 +11,13 @@ use serde_json::from_str;
 use crate::{
     error::Error,
     models::{
-        AuthClient, AuthServerHealth, AuthServerSettings, LogoutScope, OTPResponse, Provider,
-        RefreshSessionPayload, RequestMagicLinkPayload, ResendParams, ResetPasswordForEmailPayload,
-        SendSMSOtpPayload, Session, SignInEmailOtpParams, SignInWithEmailAndPasswordPayload,
-        SignInWithEmailOtpPayload, SignInWithIdTokenCredentials, SignInWithOAuthOptions,
-        SignInWithPhoneAndPasswordPayload, SignInWithSSO, SignUpWithEmailAndPasswordPayload,
-        SignUpWithPhoneAndPasswordPayload, UpdateUserPayload, User, VerifyOtpParams,
+        AuthClient, AuthServerHealth, AuthServerSettings, IdTokenCredentials, LogoutScope,
+        OAuthResponse, OTPResponse, Provider, RefreshSessionPayload, RequestMagicLinkPayload,
+        ResendParams, ResetPasswordForEmailPayload, SendSMSOtpPayload, Session,
+        SignInEmailOtpParams, SignInWithEmailAndPasswordPayload, SignInWithEmailOtpPayload,
+        SignInWithOAuthOptions, SignInWithPhoneAndPasswordPayload, SignInWithSSO,
+        SignUpWithEmailAndPasswordPayload, SignUpWithPhoneAndPasswordPayload, UpdateUserPayload,
+        User, VerifyOtpParams,
     },
 };
 

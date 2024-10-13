@@ -143,18 +143,6 @@ async fn send_email_with_otp() {
 async fn sign_in_with_oauth_test() {
     let auth_client = create_test_client();
 
-    // Must login to get a user bearer token
-    let demo_email = env::var("DEMO_EMAIL").unwrap();
-    let demo_password = env::var("DEMO_PASSWORD").unwrap();
-
-    let session = auth_client
-        .login_with_email(demo_email, demo_password)
-        .await;
-
-    if session.is_err() {
-        eprintln!("{:?}", session.as_ref().unwrap_err())
-    }
-
     let mut params = HashMap::new();
     params.insert("key".to_string(), "value".to_string());
     params.insert("second_key".to_string(), "second_value".to_string());
@@ -169,12 +157,13 @@ async fn sign_in_with_oauth_test() {
 
     let response = auth_client
         .sign_in_with_oauth(supabase_auth::models::Provider::Github, Some(options))
-        .await
-        .unwrap();
+        .await;
 
-    if response.status() != 200 {
+    if response.is_err() {
         println!("SIGN IN WITH OAUTH TEST RESPONSE -- \n{:?}", response);
     }
+
+    assert!(response.unwrap().url.to_string().len() > 1);
 }
 
 #[tokio::test]
