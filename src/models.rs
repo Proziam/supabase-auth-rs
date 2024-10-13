@@ -1,5 +1,5 @@
 use core::fmt;
-use reqwest::Client;
+use reqwest::{Client, Url};
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, fmt::Display};
 
@@ -81,12 +81,18 @@ pub struct IdTokenCredentials {
     pub gotrue_meta_security: Option<GotrueMetaSecurity>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct SignInWithOAuthOptions {
     pub query_params: Option<HashMap<String, String>>,
     pub redirect_to: Option<String>,
     pub scopes: Option<String>,
     pub skip_brower_redirect: Option<bool>,
+}
+
+#[derive(Debug)]
+pub struct OAuthResponse {
+    pub url: Url,
+    pub provider: Provider,
 }
 
 #[derive(Debug, Serialize)]
