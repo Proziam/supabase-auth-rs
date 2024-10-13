@@ -232,11 +232,10 @@ async fn update_user_test() {
 
     let session = auth_client
         .login_with_email(&demo_email, &demo_password)
-        .await;
+        .await
+        .unwrap();
 
-    if session.is_err() {
-        eprintln!("{:?}", session.as_ref().unwrap_err())
-    }
+    eprintln!("{:?}", session);
 
     let updated_user = UpdateUserPayload {
         email: Some(demo_email.clone()),
@@ -245,7 +244,7 @@ async fn update_user_test() {
     };
 
     let first_response = auth_client
-        .update_user(updated_user, session.unwrap().access_token)
+        .update_user(updated_user, session.access_token)
         .await;
 
     if first_response.is_err() {
