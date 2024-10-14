@@ -9,7 +9,7 @@ license = "MIT OR Apache-2.0"
 keywords = ["supabase", "supabase-auth", "authentication", "auth"]
 categories = ["authentication", "database"]
 homepage = "https://supabase.com"
-repository = "https://github.com/proziam/supabase-auth"
+repository = "https://github.com/proziam/supabase-auth-rs"
 
 [dependencies]
 reqwest = "0.12.7"
