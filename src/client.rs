@@ -17,11 +17,9 @@ use crate::{
         SignInEmailOtpParams, SignInWithEmailAndPasswordPayload, SignInWithEmailOtpPayload,
         SignInWithOAuthOptions, SignInWithPhoneAndPasswordPayload, SignInWithSSO,
         SignUpWithEmailAndPasswordPayload, SignUpWithPhoneAndPasswordPayload, UpdateUserPayload,
-        User, VerifyOtpParams,
+        User, VerifyOtpParams, AUTH_V1,
     },
 };
-
-const AUTH_V1: &str = "/auth/v1";
 
 impl AuthClient {
     /// Create a new Auth Client

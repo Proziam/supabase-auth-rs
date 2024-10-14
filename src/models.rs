@@ -558,3 +558,5 @@ impl fmt::Debug for AuthClient {
             .finish()
     }
 }
+
+pub const AUTH_V1: &str = "/auth/v1";
