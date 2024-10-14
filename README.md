@@ -1,6 +1,8 @@
 # Auth-rs
 
-This is a Rust implementation of the [supabase js auth client](https://github.com/supabase/gotrue-js). As of now, this is alpha software and breaking changes are a certainty. The goal is to have feature parity and an easy-to-use API. 
+This is a Rust implementation of the [supabase js auth client](https://github.com/supabase/gotrue-js). The goal is to have feature parity and an easy-to-use API. 
+
+Currently this software is functional, but not yet battle-tested or documented. The goal is to go to 1.0.0 by the end of December, 2024.
 
 ## Installation
 
@@ -9,12 +11,6 @@ This is a Rust implementation of the [supabase js auth client](https://github.co
 ```bash
 cargo add supabase-auth 
 ```
-
-## Differences to the JS client
-
-It should be noted there are, and will likely always be, differences to the [JS client](https://github.com/supabase/gotrue-js). If something bothers you enough, contributions are welcome.
-
-Any features which are currently deprecated in the [JS client](https://github.com/supabase/gotrue-js) will not be supported.
 
 ## Usage (Won't be updated until 1.0.0)
 
@@ -38,7 +34,7 @@ Any features which are currently deprecated in the [JS client](https://github.co
 - [x] Retrieve User
 - [x] Reset Password
 - [x] Change User Data (e.g., Email or password)
-- [ ] SSO
+- [x] SSO
 
 ## Contributions
 
