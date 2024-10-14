@@ -88,6 +88,10 @@ async fn test_mobile_flow() {
         .sign_in_with_phone_and_password(&demo_phone, &demo_password)
         .await;
 
+    if new_session.is_err() {
+        eprintln!("{:?}", new_session.as_ref().unwrap_err())
+    }
+
     assert!(new_session.is_ok() && new_session.unwrap().user.phone == demo_phone);
 
     let response = auth_client.send_sms_with_otp(demo_phone).await;
@@ -289,11 +293,6 @@ async fn exchange_token_for_session() {
         .unwrap();
 
     assert!(original_session.user.email == demo_email);
-
-    println!(
-        "REFRESH TOKEN BEING TESTED -- {}",
-        original_session.refresh_token
-    );
 
     let new_session = auth_client
         .refresh_session(original_session.refresh_token)

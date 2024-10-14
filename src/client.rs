@@ -9,7 +9,7 @@ use reqwest::{
 use serde_json::from_str;
 
 use crate::{
-    error::Error,
+    error::Error::{self, AuthError},
     models::{
         AuthClient, AuthServerHealth, AuthServerSettings, IdTokenCredentials, LogoutScope,
         OAuthResponse, OTPResponse, Provider, RefreshSessionPayload, RequestMagicLinkPayload,
@@ -103,7 +103,7 @@ impl AuthClient {
         let res_status = response.status();
         let res_body = response.text().await?;
 
-        let session: Session = from_str(&res_body).map_err(|_| crate::error::Error::AuthError {
+        let session: Session = from_str(&res_body).map_err(|_| AuthError {
             status: res_status,
             message: res_body,
         })?;
@@ -151,7 +151,7 @@ impl AuthClient {
         let res_status = response.status();
         let res_body = response.text().await?;
 
-        let session: Session = from_str(&res_body).map_err(|_| crate::error::Error::AuthError {
+        let session: Session = from_str(&res_body).map_err(|_| AuthError {
             status: res_status,
             message: res_body,
         })?;
@@ -196,7 +196,7 @@ impl AuthClient {
         let res_status = response.status();
         let res_body = response.text().await?;
 
-        let session: Session = from_str(&res_body).map_err(|_| crate::error::Error::AuthError {
+        let session: Session = from_str(&res_body).map_err(|_| AuthError {
             status: res_status,
             message: res_body,
         })?;
@@ -241,7 +241,7 @@ impl AuthClient {
         let res_status = response.status();
         let res_body = response.text().await?;
 
-        let session: Session = from_str(&res_body).map_err(|_| crate::error::Error::AuthError {
+        let session: Session = from_str(&res_body).map_err(|_| AuthError {
             status: res_status,
             message: res_body,
         })?;
@@ -285,7 +285,7 @@ impl AuthClient {
         if res_status.is_success() {
             Ok(())
         } else {
-            Err(crate::error::Error::AuthError {
+            Err(AuthError {
                 status: res_status,
                 message: res_body,
             })
@@ -326,7 +326,7 @@ impl AuthClient {
             let message = serde_json::from_str(&res_body)?;
             Ok(message)
         } else {
-            Err(crate::error::Error::AuthError {
+            Err(AuthError {
                 status: res_status,
                 message: res_body,
             })
@@ -371,7 +371,7 @@ impl AuthClient {
             let message = serde_json::from_str(&res_body)?;
             Ok(message)
         } else {
-            Err(crate::error::Error::AuthError {
+            Err(AuthError {
                 status: res_status,
                 message: res_body,
             })
@@ -428,7 +428,7 @@ impl AuthClient {
         if res_status.is_success() {
             Ok(OAuthResponse { url, provider })
         } else {
-            Err(crate::error::Error::AuthError {
+            Err(AuthError {
                 status: res_status,
                 message: res_body,
             })
@@ -453,24 +453,22 @@ impl AuthClient {
             HeaderValue::from_str(&format!("Bearer {}", &bearer_token.into()))?,
         );
 
-        let user = self
+        let response = self
             .client
             .get(format!("{}{}/user", self.project_url, AUTH_V1))
             .headers(headers)
             .send()
             .await?;
 
-        let res_status = user.status();
-        let res_body = user.text().await?;
+        let res_status = response.status();
+        let res_body = response.text().await?;
 
-        if res_status.is_success() {
-            return Ok(serde_json::from_str(&res_body)?);
-        } else {
-            return Err(Error::AuthError {
-                status: res_status,
-                message: res_body,
-            });
-        }
+        let user: User = serde_json::from_str(&res_body).map_err(|_| AuthError {
+            status: res_status,
+            message: res_body,
+        })?;
+
+        Ok(user)
     }
 
     /// Update the user, such as changing email or password. Each field (email, password, and data) is optional
@@ -502,7 +500,7 @@ impl AuthClient {
 
         let body = serde_json::to_string::<UpdateUserPayload>(&updated_user)?;
 
-        let user = self
+        let response = self
             .client
             .put(format!("{}{}/user", self.project_url, AUTH_V1))
             .headers(headers)
@@ -510,17 +508,15 @@ impl AuthClient {
             .send()
             .await?;
 
-        let res_status = user.status();
-        let res_body = user.text().await?;
+        let res_status = response.status();
+        let res_body = response.text().await?;
 
-        if res_status.is_success() {
-            return Ok(serde_json::from_str(&res_body)?);
-        } else {
-            return Err(Error::AuthError {
-                status: res_status,
-                message: res_body,
-            });
-        }
+        let user: User = serde_json::from_str(&res_body).map_err(|_| AuthError {
+            status: res_status,
+            message: res_body,
+        })?;
+
+        Ok(user)
     }
 
     // TODO: Add test
@@ -535,7 +531,7 @@ impl AuthClient {
 
         let body = serde_json::to_string(&credentials)?;
 
-        let session = self
+        let response = self
             .client
             .post(format!(
                 "{}{}/token?grant_type=id_token",
@@ -546,17 +542,15 @@ impl AuthClient {
             .send()
             .await?;
 
-        let res_status = session.status();
-        let res_body = session.text().await?;
+        let res_status = response.status();
+        let res_body = response.text().await?;
 
-        if res_status.is_success() {
-            return Ok(serde_json::from_str(&res_body)?);
-        } else {
-            return Err(Error::AuthError {
-                status: res_status,
-                message: res_body,
-            });
-        }
+        let session: Session = serde_json::from_str(&res_body).map_err(|_| AuthError {
+            status: res_status,
+            message: res_body,
+        })?;
+
+        Ok(session)
     }
 
     // TODO: Add test
@@ -568,7 +562,7 @@ impl AuthClient {
 
         let body = serde_json::to_string(&email.into())?;
 
-        let user = self
+        let response = self
             .client
             .post(format!("{}{}/invite", self.project_url, AUTH_V1))
             .headers(headers)
@@ -576,17 +570,15 @@ impl AuthClient {
             .send()
             .await?;
 
-        let res_status = user.status();
-        let res_body = user.text().await?;
+        let res_status = response.status();
+        let res_body = response.text().await?;
 
-        if res_status.is_success() {
-            return Ok(serde_json::from_str(&res_body)?);
-        } else {
-            return Err(Error::AuthError {
-                status: res_status,
-                message: res_body,
-            });
-        }
+        let user: User = serde_json::from_str(&res_body).map_err(|_| AuthError {
+            status: res_status,
+            message: res_body,
+        })?;
+
+        Ok(user)
     }
 
     // TODO: Add test
@@ -603,11 +595,17 @@ impl AuthClient {
             .headers(headers)
             .body(body)
             .send()
-            .await?
-            .text()
             .await?;
 
-        Ok(from_str(&response)?)
+        let res_status = response.status();
+        let res_body = response.text().await?;
+
+        let session: Session = serde_json::from_str(&res_body).map_err(|_| AuthError {
+            status: res_status,
+            message: res_body,
+        })?;
+
+        Ok(session)
     }
 
     /// Check the Health Status of the Auth Server
@@ -627,11 +625,17 @@ impl AuthClient {
             .get(&format!("{}{}/health", self.project_url, AUTH_V1))
             .headers(headers)
             .send()
-            .await?
-            .text()
             .await?;
 
-        Ok(from_str(&response)?)
+        let res_status = response.status();
+        let res_body = response.text().await?;
+
+        let health: AuthServerHealth = serde_json::from_str(&res_body).map_err(|_| AuthError {
+            status: res_status,
+            message: res_body,
+        })?;
+
+        Ok(health)
     }
 
     /// Retrieve the public settings of the server
@@ -646,24 +650,23 @@ impl AuthClient {
         let mut headers = HeaderMap::new();
         headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
 
-        let settings = self
+        let response = self
             .client
             .get(&format!("{}{}/settings", self.project_url, AUTH_V1))
             .headers(headers)
             .send()
             .await?;
 
-        let res_status = settings.status();
-        let res_body = settings.text().await?;
+        let res_status = response.status();
+        let res_body = response.text().await?;
 
-        if res_status.is_success() {
-            return Ok(serde_json::from_str(&res_body)?);
-        } else {
-            return Err(Error::AuthError {
+        let settings: AuthServerSettings =
+            serde_json::from_str(&res_body).map_err(|_| AuthError {
                 status: res_status,
                 message: res_body,
-            });
-        }
+            })?;
+
+        Ok(settings)
     }
 
     /// Exchange refresh token for a new session
@@ -693,7 +696,7 @@ impl AuthClient {
             refresh_token: refresh_token.into(),
         })?;
 
-        let session = self
+        let response = self
             .client
             .post(&format!(
                 "{}{}/token?grant_type=refresh_token",
@@ -704,17 +707,15 @@ impl AuthClient {
             .send()
             .await?;
 
-        let res_status = session.status();
-        let res_body = session.text().await?;
+        let res_status = response.status();
+        let res_body = response.text().await?;
 
-        if res_status.is_success() {
-            return Ok(serde_json::from_str(&res_body)?);
-        } else {
-            return Err(Error::AuthError {
-                status: res_status,
-                message: res_body,
-            });
-        }
+        let session: Session = from_str(&res_body).map_err(|_| AuthError {
+            status: res_status,
+            message: res_body,
+        })?;
+
+        Ok(session)
     }
 
     pub async fn refresh_session(&self, refresh_token: String) -> Result<Session, Error> {
@@ -849,7 +850,7 @@ impl AuthClient {
         let res_body = response.text().await?;
 
         if res_status.is_server_error() || res_status.is_client_error() {
-            return Err(crate::error::Error::AuthError {
+            return Err(AuthError {
                 status: res_status,
                 message: res_body,
             });
