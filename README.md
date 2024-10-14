@@ -1,4 +1,4 @@
-# Auth-rs
+# Supabase-auth 
 
 This is a Rust implementation of the [supabase js auth client](https://github.com/supabase/gotrue-js). The goal is to have feature parity and an easy-to-use API. 
 
