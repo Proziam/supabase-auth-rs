@@ -69,7 +69,7 @@ pub struct UserMetadata {
     pub sub: Option<String>,
 }
 
-#[derive(Debug, Serialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct IdTokenCredentials {
     /// Provider name or OIDC iss value identifying which provider should be used to verify the provided token.
     pub provider: Provider,
@@ -97,7 +97,7 @@ pub struct OAuthResponse {
     pub provider: Provider,
 }
 
-#[derive(Debug, Serialize, PartialEq, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct GotrueMetaSecurity {
     /// Verification token received when the user completes the captcha on the site.
     captcha_token: Option<String>,
@@ -126,67 +126,67 @@ pub struct IdentityData {
     pub sub: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum LoginOptions {
     Email(String),
     Phone(String),
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SignInWithEmailAndPasswordPayload {
     pub(crate) email: String,
     pub(crate) password: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SignInWithPhoneAndPasswordPayload {
     pub(crate) phone: String,
     pub(crate) password: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SignUpWithEmailAndPasswordPayload {
     pub(crate) email: String,
     pub(crate) password: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SignUpWithPhoneAndPasswordPayload {
     pub(crate) phone: String,
     pub(crate) password: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct RequestMagicLinkPayload {
     pub(crate) email: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct UpdateUserPayload {
     pub email: Option<String>,
     pub password: Option<String>,
     pub data: Option<serde_json::Value>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SendSMSOtpPayload {
     pub phone: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct OTPResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message_id: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum VerifyOtpParams {
     Mobile(VerifyMobileOtpParams),
     Email(VerifyEmailOtpParams),
     TokenHash(VerifyTokenHashParams),
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct VerifyMobileOtpParams {
     /// The user's phone number.
     pub phone: String,
@@ -200,11 +200,9 @@ pub struct VerifyMobileOtpParams {
     pub options: Option<VerifyOtpOptions>,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct VerifyEmailOtpParams {
-    /// The user's phone number.
-    pub email: String,
-    /// The otp sent to the user's phone number.
+    /// The user's phone number. pub email: String, The otp sent to the user's phone number.
     pub token: String,
     /// The user's verification type.
     #[serde(rename = "type")]
@@ -214,7 +212,7 @@ pub struct VerifyEmailOtpParams {
     pub options: Option<VerifyOtpOptions>,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct VerifyTokenHashParams {
     /// The user's phone number.
     pub token_hash: String,
@@ -223,9 +221,10 @@ pub struct VerifyTokenHashParams {
     pub otp_type: MobileOtpType,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum EmailOtpType {
+    #[default]
     Signup,
     Invite,
     Magiclink,
@@ -234,21 +233,22 @@ pub enum EmailOtpType {
     Email,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum MobileOtpType {
+    #[default]
     Sms,
     PhoneChange,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct VerifyOtpOptions {
     /// A URL to send the user to after they are confirmed.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub redirect_to: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum SignInWithOtp {
     Mobile(SignInMobileOtpParams),
     Email(SignInEmailOtpParams),
@@ -269,7 +269,7 @@ pub struct SignInWithEmailOtp {
     pub options: Option<SignInEmailOtpParams>,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Default)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct SignInEmailOtpParams {
     /// Verification token received when the user completes the captcha on the site.
     pub captcha_token: Option<String>,
@@ -281,7 +281,7 @@ pub struct SignInEmailOtpParams {
     pub should_create_user: Option<bool>,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Default)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct SignInMobileOtpParams {
     /// Verification token received when the user completes the captcha on the site.
     pub captcha_token: Option<String>,
@@ -293,23 +293,23 @@ pub struct SignInMobileOtpParams {
     pub should_create_user: Option<bool>,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Default)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct RefreshSessionPayload {
     pub refresh_token: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Default)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct ResetPasswordForEmailPayload {
     pub email: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum ResendParams {
     Desktop(DesktopResendParams),
     Mobile(MobileResendParams),
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct DesktopResendParams {
     #[serde(rename = "type")]
     pub otp_type: EmailOtpType,
@@ -317,13 +317,13 @@ pub struct DesktopResendParams {
     pub options: Option<DesktopResendOptions>,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Default)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct DesktopResendOptions {
     pub email_redirect_to: Option<String>,
     pub captcha_token: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct MobileResendParams {
     #[serde(rename = "type")]
     pub otp_type: MobileOtpType,
@@ -331,14 +331,15 @@ pub struct MobileResendParams {
     pub options: Option<MobileResendOptions>,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Default)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct MobileResendOptions {
     captcha_token: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum Channel {
+    #[default]
     Sms,
     Whatsapp,
 }
@@ -353,7 +354,7 @@ impl Display for Channel {
 }
 
 /// Health status of the Auth Server
-#[derive(Debug, Serialize, Deserialize, PartialEq, Default)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct AuthServerHealth {
     /// Version of the service
     pub version: String,
@@ -403,7 +404,7 @@ pub struct External {
     pub zoom: bool,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 /// Currently enabled OAuth providers.
 ///
 /// # Example
@@ -466,15 +467,16 @@ impl Display for Provider {
 }
 
 /// Represents the scope of the logout operation
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum LogoutScope {
+    #[default]
     Global,
     Local,
     Others,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Default)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct SignInWithSSO {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub provider_id: Option<String>,
@@ -484,7 +486,7 @@ pub struct SignInWithSSO {
     pub options: Option<SSOSignInOptions>,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Default)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct SSOSignInOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
     captcha_token: Option<String>,
@@ -492,14 +494,14 @@ pub struct SSOSignInOptions {
     redirect_to: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Default)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct SSOSuccess {
     pub url: String,
     pub status: u16,
     pub headers: Headers,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Default)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Headers {
     pub date: String,
     #[serde(rename = "content-type")]
