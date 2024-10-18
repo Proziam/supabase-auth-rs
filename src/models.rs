@@ -3,6 +3,7 @@
 use core::fmt;
 use reqwest::{Client, Url};
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use std::{collections::HashMap, fmt::Display};
 
 /// Supabase Auth Client
@@ -159,12 +160,26 @@ pub struct SignInWithPhoneAndPasswordPayload {
 pub struct SignUpWithEmailAndPasswordPayload {
     pub(crate) email: String,
     pub(crate) password: String,
+    pub(crate) options: Option<SignUpWithPasswordOptions>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SignUpWithPhoneAndPasswordPayload {
     pub(crate) phone: String,
     pub(crate) password: String,
+    pub(crate) options: Option<SignUpWithPasswordOptions>,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct SignUpWithPasswordOptions {
+    /// The redirect url embedded in the email link
+    pub email_redirect_to: Option<String>,
+    /// A custom data object to store the user's metadata. This maps to the `auth.users.raw_user_meta_data` column.
+    ///
+    /// The `data` should be a JSON object that includes user-specific info, such as their first and last name.
+    pub data: Option<Value>,
+    /// Verification token received when the user completes the captcha on the site.
+    pub captcha_token: Option<String>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]

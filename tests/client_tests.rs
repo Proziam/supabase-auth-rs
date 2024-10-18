@@ -3,7 +3,7 @@ use std::{collections::HashMap, env, thread};
 
 use supabase_auth::models::{
     AuthClient, DesktopResendParams, LogoutScope, ResendParams, SignInWithOAuthOptions,
-    SignInWithSSO, UpdateUserPayload,
+    SignInWithSSO, SignUpWithPasswordOptions, UpdateUserPayload,
 };
 
 fn create_test_client() -> AuthClient {
@@ -56,7 +56,7 @@ async fn sign_up_with_email_test_valid() {
     let demo_password = "ciJUAojfZZYKfCxkiUWH";
 
     let session = auth_client
-        .sign_up_with_email_and_password(demo_email.as_ref(), demo_password)
+        .sign_up_with_email_and_password(demo_email.as_ref(), demo_password, None)
         .await
         .unwrap();
 
@@ -74,8 +74,13 @@ async fn test_mobile_flow() {
     let demo_phone = env::var("DEMO_PHONE").unwrap();
     let demo_password = env::var("DEMO_PASSWORD").unwrap();
 
+    let options = SignUpWithPasswordOptions {
+        email_redirect_to: Some(String::from("a_random_url")),
+        ..Default::default()
+    };
+
     let session = auth_client
-        .sign_up_with_phone_and_password(demo_phone.clone(), demo_password.clone())
+        .sign_up_with_phone_and_password(demo_phone.clone(), demo_password.clone(), Some(options))
         .await;
 
     if session.is_err() {
@@ -327,7 +332,7 @@ async fn resend_email_test() {
     let demo_password = "ciJUAojfZZYKfCxkiUWH";
 
     let session = auth_client
-        .sign_up_with_email_and_password(demo_email.clone(), demo_password.to_string())
+        .sign_up_with_email_and_password(demo_email.clone(), demo_password.to_string(), None)
         .await;
 
     if session.is_err() {

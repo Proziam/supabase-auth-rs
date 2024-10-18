@@ -16,8 +16,8 @@ use crate::{
         ResendParams, ResetPasswordForEmailPayload, SendSMSOtpPayload, Session,
         SignInEmailOtpParams, SignInWithEmailAndPasswordPayload, SignInWithEmailOtpPayload,
         SignInWithOAuthOptions, SignInWithPhoneAndPasswordPayload, SignInWithSSO,
-        SignUpWithEmailAndPasswordPayload, SignUpWithPhoneAndPasswordPayload, UpdateUserPayload,
-        User, VerifyOtpParams, AUTH_V1,
+        SignUpWithEmailAndPasswordPayload, SignUpWithPasswordOptions,
+        SignUpWithPhoneAndPasswordPayload, UpdateUserPayload, User, VerifyOtpParams, AUTH_V1,
     },
 };
 
@@ -171,10 +171,12 @@ impl AuthClient {
         &self,
         email: S,
         password: S,
+        options: Option<SignUpWithPasswordOptions>,
     ) -> Result<Session, Error> {
         let payload = SignUpWithEmailAndPasswordPayload {
             email: email.into(),
             password: password.into(),
+            options,
         };
 
         let mut headers = header::HeaderMap::new();
@@ -216,10 +218,12 @@ impl AuthClient {
         &self,
         phone: S,
         password: S,
+        options: Option<SignUpWithPasswordOptions>,
     ) -> Result<Session, Error> {
         let payload = SignUpWithPhoneAndPasswordPayload {
             phone: phone.into(),
             password: password.into(),
+            options,
         };
 
         let mut headers = header::HeaderMap::new();
