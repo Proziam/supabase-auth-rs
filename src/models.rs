@@ -19,14 +19,25 @@ pub struct AuthClient {
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Session {
+    /// The oauth provider token. If present, this can be used to make external API requests to the oauth provider used.
+    pub provider_token: Option<String>,
+    /// The oauth provider refresh token. If present, this can be used to refresh the provider_token via the oauth provider's API.
+    ///
+    /// Not all oauth providers return a provider refresh token. If the provider_refresh_token is missing, please refer to the oauth provider's documentation for information on how to obtain the provider refresh token.
+    pub provider_refresh_token: Option<String>,
+    /// The access token jwt. It is recommended to set the JWT_EXPIRY to a shorter expiry value.
     pub access_token: String,
     pub token_type: String,
+    /// The number of seconds until the token expires (since it was issued). Returned when a login is confirmed.
     pub expires_in: i64,
+    /// A timestamp of when the token will expire. Returned when a login is confirmed.
     pub expires_at: u64,
+    /// A one-time used refresh token that never expires.
     pub refresh_token: String,
     pub user: User,
 }
 
+/// User respresents a registered user
 #[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct User {
     pub id: String,
@@ -496,6 +507,11 @@ pub struct SSOSignInOptions {
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct SSOSuccess {
+    /// URL to open in a browser which will complete the sign-in flow by
+    /// taking the user to the identity provider's authentication flow.
+    ///
+    /// On browsers you can set the URL to `window.location.href` to take
+    /// the user to the authentication flow.
     pub url: String,
     pub status: u16,
     pub headers: Headers,
