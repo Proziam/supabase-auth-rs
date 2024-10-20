@@ -330,6 +330,7 @@ pub struct ResetPasswordForEmailPayload {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(untagged)]
 pub enum ResendParams {
     Desktop(DesktopResendParams),
     Mobile(MobileResendParams),
