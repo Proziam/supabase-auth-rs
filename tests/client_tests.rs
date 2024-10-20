@@ -372,10 +372,13 @@ async fn logout_test() {
 
     let logout = auth_client
         .logout(Some(LogoutScope::Global), session.access_token)
-        .await
-        .unwrap();
+        .await;
 
-    assert!(logout.status().is_success())
+    if logout.is_err() {
+        println!("{:?}", logout)
+    }
+
+    assert!(logout.is_ok())
 }
 
 #[tokio::test]

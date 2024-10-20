@@ -809,7 +809,7 @@ impl AuthClient {
         &self,
         scope: Option<LogoutScope>,
         bearer_token: S,
-    ) -> Result<Response, Error> {
+    ) -> Result<(), Error> {
         let mut headers = HeaderMap::new();
         headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
         headers.insert(CONTENT_TYPE, HeaderValue::from_str("application/json")?);
@@ -828,7 +828,17 @@ impl AuthClient {
             .send()
             .await?;
 
-        Ok(response)
+        let res_status = response.status();
+        let res_body = response.text().await?;
+
+        if res_status.is_success() {
+            Ok(())
+        } else {
+            Err(Error::AuthError {
+                status: res_status,
+                message: res_body,
+            })
+        }
     }
 
     /// Initiates an SSO Login Flow
