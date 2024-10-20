@@ -220,7 +220,7 @@ pub struct VerifyMobileOtpParams {
     pub token: String,
     /// The user's verification type.
     #[serde(rename = "type")]
-    pub otp_type: MobileOtpType,
+    pub otp_type: OtpType,
     /// Optional parameters
     #[serde(skip_serializing_if = "Option::is_none")]
     pub options: Option<VerifyOtpOptions>,
@@ -232,7 +232,7 @@ pub struct VerifyEmailOtpParams {
     pub token: String,
     /// The user's verification type.
     #[serde(rename = "type")]
-    pub otp_type: EmailOtpType,
+    pub otp_type: OtpType,
     /// Optional parameters
     #[serde(skip_serializing_if = "Option::is_none")]
     pub options: Option<VerifyOtpOptions>,
@@ -244,25 +244,15 @@ pub struct VerifyTokenHashParams {
     pub token_hash: String,
     /// The user's verification type.
     #[serde(rename = "type")]
-    pub otp_type: MobileOtpType,
+    pub otp_type: OtpType,
 }
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "snake_case")]
-pub enum EmailOtpType {
+pub enum OtpType {
     #[default]
     Signup,
-    Invite,
-    Magiclink,
-    Recovery,
     EmailChange,
-    Email,
-}
-
-#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
-#[serde(rename_all = "snake_case")]
-pub enum MobileOtpType {
-    #[default]
     Sms,
     PhoneChange,
 }
@@ -329,17 +319,10 @@ pub struct ResetPasswordForEmailPayload {
     pub email: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-#[serde(untagged)]
-pub enum ResendParams {
-    Desktop(DesktopResendParams),
-    Mobile(MobileResendParams),
-}
-
 #[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub struct DesktopResendParams {
+pub struct ResendParams {
     #[serde(rename = "type")]
-    pub otp_type: EmailOtpType,
+    pub otp_type: OtpType,
     pub email: String,
     pub options: Option<DesktopResendOptions>,
 }
@@ -353,7 +336,7 @@ pub struct DesktopResendOptions {
 #[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct MobileResendParams {
     #[serde(rename = "type")]
-    pub otp_type: MobileOtpType,
+    pub otp_type: OtpType,
     pub phone: String,
     pub options: Option<MobileResendOptions>,
 }

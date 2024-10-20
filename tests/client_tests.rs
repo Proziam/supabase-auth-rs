@@ -2,8 +2,8 @@ use core::time;
 use std::{collections::HashMap, env, thread};
 
 use supabase_auth::models::{
-    AuthClient, DesktopResendParams, LogoutScope, ResendParams, SignInWithOAuthOptions,
-    SignInWithSSO, SignUpWithPasswordOptions, UpdateUserPayload,
+    AuthClient, LogoutScope, ResendParams, SignInWithOAuthOptions, SignInWithSSO,
+    SignUpWithPasswordOptions, UpdateUserPayload,
 };
 
 fn create_test_client() -> AuthClient {
@@ -339,8 +339,8 @@ async fn resend_email_test() {
         eprintln!("{:?}", session.as_ref().unwrap_err())
     }
 
-    let credentials = DesktopResendParams {
-        otp_type: supabase_auth::models::EmailOtpType::Email,
+    let credentials = ResendParams {
+        otp_type: supabase_auth::models::OtpType::Signup,
         email: demo_email.to_owned(),
         options: None,
     };
@@ -349,7 +349,11 @@ async fn resend_email_test() {
     let one_minute = time::Duration::from_secs(60);
     thread::sleep(one_minute);
 
-    let response = auth_client.resend(ResendParams::Desktop(credentials)).await;
+    let response = auth_client.resend(credentials).await;
+
+    if response.is_err() {
+        println!("{:?}", response)
+    }
 
     assert!(response.is_ok() && session.unwrap().user.email == demo_email)
 }
