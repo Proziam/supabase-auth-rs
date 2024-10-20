@@ -779,7 +779,7 @@ impl AuthClient {
 
         let body = serde_json::to_string(&credentials)?;
 
-        let _response = self
+        let response = self
             .client
             .post(&format!("{}{}/resend", self.project_url, AUTH_V1))
             .headers(headers)
@@ -787,7 +787,17 @@ impl AuthClient {
             .send()
             .await?;
 
-        Ok(())
+        let res_status = response.status();
+        let res_body = response.text().await?;
+
+        if res_status.is_success() {
+            Ok(())
+        } else {
+            Err(Error::AuthError {
+                status: res_status,
+                message: res_body,
+            })
+        }
     }
 
     /// Logs out a user with a given scope
