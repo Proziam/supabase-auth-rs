@@ -556,6 +556,18 @@ impl AuthClient {
     }
 
     /// Sends an invite link to an email address.
+    /// Requires admin permissions to issue invites
+    ///
+    /// The data field corresponds to the `raw_user_meta_data` User field
+    /// # Example
+    /// ```
+    /// let demo_email = env::var("DEMO_INVITE").unwrap();
+    ///
+    /// let user = auth_client
+    ///     .invite_user_by_email(&demo_email, None, auth_client.api_key())
+    ///     .await
+    ///     .unwrap();
+    ///```
     pub async fn invite_user_by_email<S: Into<String>>(
         &self,
         email: S,

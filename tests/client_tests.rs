@@ -404,8 +404,6 @@ async fn invite_by_email_test() {
 
     let demo_email = env::var("DEMO_INVITE").unwrap();
 
-    println!("{}", auth_client.api_key());
-
     let user = auth_client
         // NOTE: Requires admin permissions to issue invites
         .invite_user_by_email(&demo_email, None, auth_client.api_key())
