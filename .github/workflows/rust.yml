@@ -27,6 +27,8 @@ jobs:
       DEMO_PHONE: ${{ secrets.DEMO_PHONE}}
       DEMO_PASSWORD: ${{ secrets.DEMO_PASSWORD}}
       DEMO_DOMAIN: ${{ secrets.DEMO_DOMAIN}}
+      DEMO_INVITE: ${{ secrets.DEMO_INVITE}}
+
 
 
 
