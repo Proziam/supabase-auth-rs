@@ -88,7 +88,7 @@ pub struct UserMetadata {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct IdTokenCredentials {
-    /// Provider name or OIDC iss value identifying which provider should be used to verify the provided token.
+    /// Provider name or OIDC `iss` value identifying which provider should be used to verify the provided token.
     pub provider: Provider,
     /// OIDC ID token issued by the specified provider. The iss claim in the ID token must match the supplied provider. Some ID tokens contain an at_hash which require that you provide an access_token value to be accepted properly. If the token contains a nonce claim you must supply the nonce used to obtain the ID token.
     pub token: String,
