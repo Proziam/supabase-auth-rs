@@ -4,19 +4,19 @@ use std::env;
 
 use reqwest::{
     header::{self, HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE},
-    Client, Response, Url,
+    Client, Url,
 };
-use serde_json::from_str;
+use serde_json::{from_str, Value};
 
 use crate::{
     error::Error::{self, AuthError},
     models::{
-        AuthClient, AuthServerHealth, AuthServerSettings, IdTokenCredentials, LogoutScope,
-        OAuthResponse, OTPResponse, Provider, RefreshSessionPayload, RequestMagicLinkPayload,
-        ResendParams, ResetPasswordForEmailPayload, SendSMSOtpPayload, Session,
-        SignInEmailOtpParams, SignInWithEmailAndPasswordPayload, SignInWithEmailOtpPayload,
-        SignInWithOAuthOptions, SignInWithPhoneAndPasswordPayload, SignInWithSSO,
-        SignUpWithEmailAndPasswordPayload, SignUpWithPasswordOptions,
+        AuthClient, AuthServerHealth, AuthServerSettings, IdTokenCredentials, InviteParams,
+        LogoutScope, OAuthResponse, OTPResponse, Provider, RefreshSessionPayload,
+        RequestMagicLinkPayload, ResendParams, ResetPasswordForEmailPayload, SendSMSOtpPayload,
+        Session, SignInEmailOtpParams, SignInWithEmailAndPasswordPayload,
+        SignInWithEmailOtpPayload, SignInWithOAuthOptions, SignInWithPhoneAndPasswordPayload,
+        SignInWithSSO, SignUpWithEmailAndPasswordPayload, SignUpWithPasswordOptions,
         SignUpWithPhoneAndPasswordPayload, UpdateUserPayload, User, VerifyOtpParams, AUTH_V1,
     },
 };
@@ -555,14 +555,27 @@ impl AuthClient {
         Ok(session)
     }
 
-    // TODO: Add test
     /// Sends an invite link to an email address.
-    pub async fn invite_user_by_email<S: Into<String>>(&self, email: S) -> Result<User, Error> {
+    pub async fn invite_user_by_email<S: Into<String>>(
+        &self,
+        email: S,
+        data: Option<Value>,
+        bearer_token: S,
+    ) -> Result<User, Error> {
         let mut headers = HeaderMap::new();
         headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
         headers.insert(CONTENT_TYPE, HeaderValue::from_str("application/json")?);
+        headers.insert(
+            AUTHORIZATION,
+            HeaderValue::from_str(&format!("Bearer {}", &bearer_token.into()))?,
+        );
 
-        let body = serde_json::to_string(&email.into())?;
+        let invite_payload = InviteParams {
+            email: email.into(),
+            data,
+        };
+
+        let body = serde_json::to_string(&invite_payload)?;
 
         let response = self
             .client

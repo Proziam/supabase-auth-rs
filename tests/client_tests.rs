@@ -399,6 +399,23 @@ async fn test_sso_login() {
 }
 
 #[tokio::test]
+async fn invite_by_email_test() {
+    let auth_client = create_test_client();
+
+    let demo_email = env::var("DEMO_INVITE").unwrap();
+
+    println!("{}", auth_client.api_key());
+
+    let user = auth_client
+        // NOTE: Requires admin permissions to issue invites
+        .invite_user_by_email(&demo_email, None, auth_client.api_key())
+        .await
+        .unwrap();
+
+    assert!(user.email == demo_email)
+}
+
+#[tokio::test]
 async fn get_settings_test() {
     let auth_client = create_test_client();
 
