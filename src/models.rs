@@ -46,6 +46,10 @@ pub struct User {
     pub role: String,
     pub email: String,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub invited_at: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub confirmation_sent_at: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub email_confirmed_at: Option<String>,
     pub phone: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -54,7 +58,8 @@ pub struct User {
     pub confirmed_at: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub recovery_sent_at: Option<String>,
-    pub last_sign_in_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_sign_in_at: Option<String>,
     pub app_metadata: AppMetadata,
     pub user_metadata: UserMetadata,
     pub identities: Vec<Identity>,
