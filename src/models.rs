@@ -210,14 +210,15 @@ pub struct OTPResponse {
     pub message_id: Option<String>,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(untagged)]
 pub enum VerifyOtpParams {
     Mobile(VerifyMobileOtpParams),
     Email(VerifyEmailOtpParams),
     TokenHash(VerifyTokenHashParams),
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct VerifyMobileOtpParams {
     /// The user's phone number.
     pub phone: String,

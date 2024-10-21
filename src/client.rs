@@ -619,7 +619,20 @@ impl AuthClient {
         Ok(user)
     }
 
-    // TODO: Add test
+    /// Verify the OTP sent to the user
+    /// # Example
+    /// ```
+    /// let params = VerifyEmailOtpParams {
+    ///     token: "abc123",
+    ///     otp_type: OtpType::EmailChange,
+    ///     options: None,
+    /// };
+    ///
+    /// let session = auth_client
+    ///     .verify_otp(params)
+    ///     .await
+    ///     .unwrap();
+    ///```
     pub async fn verify_otp(&self, params: VerifyOtpParams) -> Result<Session, Error> {
         let mut headers = HeaderMap::new();
         headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
