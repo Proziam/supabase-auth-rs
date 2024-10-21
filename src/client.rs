@@ -521,8 +521,19 @@ impl AuthClient {
         Ok(user)
     }
 
-    // TODO: Add test
     /// Allows signing in with an OIDC ID token. The authentication provider used should be enabled and configured.
+    /// # Example
+    /// ```
+    /// let credentials = IdTokenCredentials {
+    ///     provider: Provider::Github,
+    ///     token: "<id-token-from-auth-provider>",
+    /// };
+    ///
+    /// let session = auth_client
+    ///     .sign_in_with_id_token(credentials)
+    ///     .await
+    ///     .unwrap();
+    /// ```
     pub async fn sign_in_with_id_token(
         &self,
         credentials: IdTokenCredentials,
