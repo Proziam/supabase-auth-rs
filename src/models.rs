@@ -333,6 +333,12 @@ pub struct ResendParams {
 }
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct InviteParams {
+    pub email: String,
+    pub data: Option<Value>,
+}
+
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct DesktopResendOptions {
     pub email_redirect_to: Option<String>,
     pub captcha_token: Option<String>,
