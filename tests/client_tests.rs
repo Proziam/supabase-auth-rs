@@ -90,7 +90,7 @@ async fn test_mobile_flow() {
     assert!(session.is_ok());
 
     let new_session = auth_client
-        .sign_in_with_phone_and_password(&demo_phone, &demo_password)
+        .login_with_phone(&demo_phone, &demo_password)
         .await;
 
     if new_session.is_err() {
@@ -165,7 +165,7 @@ async fn sign_in_with_oauth_test() {
     };
 
     let response = auth_client
-        .sign_in_with_oauth(supabase_auth::models::Provider::Github, Some(options))
+        .login_with_oauth(supabase_auth::models::Provider::Github, Some(options))
         .await;
 
     if response.is_err() {
@@ -179,20 +179,20 @@ async fn sign_in_with_oauth_test() {
 async fn sign_in_with_oauth_no_options_test() {
     let auth_client = create_test_client();
 
-    // Must login to get a user bearer token
-    let demo_email = env::var("DEMO_EMAIL").unwrap();
-    let demo_password = env::var("DEMO_PASSWORD").unwrap();
-
-    let session = auth_client
-        .login_with_email(demo_email, demo_password)
-        .await;
-
-    if session.is_err() {
-        eprintln!("{:?}", session.as_ref().unwrap_err())
-    }
+    // // Must login to get a user bearer token
+    // let demo_email = env::var("DEMO_EMAIL").unwrap();
+    // let demo_password = env::var("DEMO_PASSWORD").unwrap();
+    //
+    // let session = auth_client
+    //     .login_with_email(demo_email, demo_password)
+    //     .await;
+    //
+    // if session.is_err() {
+    //     eprintln!("{:?}", session.as_ref().unwrap_err())
+    // }
 
     let response = auth_client
-        .sign_in_with_oauth(supabase_auth::models::Provider::Github, None)
+        .login_with_oauth(supabase_auth::models::Provider::Github, None)
         .await;
 
     println!(

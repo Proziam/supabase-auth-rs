@@ -113,13 +113,13 @@ impl AuthClient {
     /// # Example
     /// ```
     /// let session = auth_client
-    ///     .sign_in_with_phone_and_password(demo_phone, demo_password)
+    ///     .login_with_phone(demo_phone, demo_password)
     ///     .await
     ///     .unwrap();
     ///
     /// assert!(session.user.phone == demo_phone)
     /// ```
-    pub async fn sign_in_with_phone_and_password<S: Into<String>>(
+    pub async fn login_with_phone<S: Into<String>>(
         &self,
         phone: S,
         password: S,
@@ -399,7 +399,7 @@ impl AuthClient {
     ///     .await
     ///     .unwrap();
     /// ```
-    pub async fn sign_in_with_oauth(
+    pub async fn login_with_oauth(
         &self,
         provider: Provider,
         options: Option<SignInWithOAuthOptions>,
