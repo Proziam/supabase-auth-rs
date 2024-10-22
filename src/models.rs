@@ -501,8 +501,10 @@ pub enum LogoutScope {
 #[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct SignInWithSSO {
     #[serde(skip_serializing_if = "Option::is_none")]
+    /// UUID of the SSO provider to invoke single-sign on to
     pub provider_id: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    /// Domain of the SSO provider where users can initiate sign on
     pub domain: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub options: Option<SSOSignInOptions>,
@@ -511,8 +513,10 @@ pub struct SignInWithSSO {
 #[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct SSOSignInOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
+    /// Verification token received when the user completes the captcha on the site.
     captcha_token: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    /// A URL to send the user to after they have signed-in.
     redirect_to: Option<String>,
 }
 
