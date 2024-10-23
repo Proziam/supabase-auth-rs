@@ -1,8 +1,8 @@
-# Supabase-auth 
+# Supabase Auth
 
 This is a Rust implementation of the [supabase js auth client](https://github.com/supabase/gotrue-js). The goal is to have feature parity and an easy-to-use API. 
 
-Currently this software is functional, but not yet battle-tested or documented. The goal is to go to 1.0.0 by the end of December, 2024.
+Currently this software is functional, but not yet battle-tested. The goal is to go to 1.0.0 by the end of December, 2024.
 
 ## Installation
 
@@ -12,7 +12,7 @@ Currently this software is functional, but not yet battle-tested or documented. 
 cargo add supabase-auth 
 ```
 
-## Usage (Won't be updated until 1.0.0)
+## Usage
 
 ### Create an Auth Client
 
