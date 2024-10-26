@@ -80,7 +80,7 @@ async fn test_mobile_flow() {
     };
 
     let session = auth_client
-        .sign_up_with_phone_and_password(demo_phone.clone(), demo_password.clone(), Some(options))
+        .sign_up_with_phone_and_password(&demo_phone, &demo_password, Some(options))
         .await;
 
     if session.is_err() {
@@ -99,7 +99,7 @@ async fn test_mobile_flow() {
 
     assert!(new_session.is_ok() && new_session.unwrap().user.phone == demo_phone);
 
-    let response = auth_client.send_sms_with_otp(demo_phone).await;
+    let response = auth_client.send_sms_with_otp(&demo_phone).await;
 
     if response.is_err() {
         eprintln!("{:?}", response.as_ref().unwrap_err())
@@ -115,7 +115,7 @@ async fn send_login_email_with_magic_link() {
     let demo_email = env::var("DEMO_EMAIL").unwrap();
 
     let response = auth_client
-        .send_login_email_with_magic_link(demo_email)
+        .send_login_email_with_magic_link(&demo_email)
         .await;
 
     if response.is_err() {
@@ -135,7 +135,7 @@ async fn send_email_with_otp() {
 
     let demo_email = env::var("DEMO_EMAIL").unwrap();
 
-    let response = auth_client.send_email_with_otp(demo_email, None).await;
+    let response = auth_client.send_email_with_otp(&demo_email, None).await;
 
     if response.is_err() {
         eprintln!("{:?}", response.as_ref().unwrap_err())
@@ -224,7 +224,7 @@ async fn get_user_test() {
     }
 
     let user = auth_client
-        .get_user(session.unwrap().access_token)
+        .get_user(&session.unwrap().access_token)
         .await
         .unwrap();
 
@@ -253,7 +253,7 @@ async fn update_user_test() {
     };
 
     let first_response = auth_client
-        .update_user(updated_user, session.access_token)
+        .update_user(updated_user, &session.access_token)
         .await;
 
     if first_response.is_err() {
@@ -279,7 +279,7 @@ async fn update_user_test() {
     };
 
     let second_response = auth_client
-        .update_user(original_user, new_session.unwrap().access_token)
+        .update_user(original_user, &new_session.unwrap().access_token)
         .await;
 
     assert!(second_response.is_ok())
@@ -300,7 +300,7 @@ async fn exchange_token_for_session() {
     assert!(original_session.user.email == demo_email);
 
     let new_session = auth_client
-        .refresh_session(original_session.refresh_token)
+        .refresh_session(&original_session.refresh_token)
         .await
         .unwrap();
 
@@ -313,7 +313,7 @@ async fn reset_password_for_email_test() {
 
     let demo_email = env::var("DEMO_EMAIL").unwrap();
 
-    let response = auth_client.reset_password_for_email(demo_email).await;
+    let response = auth_client.reset_password_for_email(&demo_email).await;
 
     // Wait to prevent running into Supabase rate limits when running cargo test
     let one_minute = time::Duration::from_secs(60);
@@ -332,7 +332,7 @@ async fn resend_email_test() {
     let demo_password = "ciJUAojfZZYKfCxkiUWH";
 
     let session = auth_client
-        .sign_up_with_email_and_password(demo_email.clone(), demo_password.to_string(), None)
+        .sign_up_with_email_and_password(&demo_email, demo_password, None)
         .await;
 
     if session.is_err() {
@@ -366,12 +366,12 @@ async fn logout_test() {
     let demo_password = env::var("DEMO_PASSWORD").unwrap();
 
     let session = auth_client
-        .login_with_email(demo_email, demo_password.to_string())
+        .login_with_email(&demo_email, &demo_password)
         .await
         .unwrap();
 
     let logout = auth_client
-        .logout(Some(LogoutScope::Global), session.access_token)
+        .logout(Some(LogoutScope::Global), &session.access_token)
         .await;
 
     if logout.is_err() {

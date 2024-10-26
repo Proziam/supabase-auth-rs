@@ -150,28 +150,28 @@ pub enum LoginOptions {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct SignInWithEmailAndPasswordPayload {
-    pub(crate) email: String,
-    pub(crate) password: String,
+pub struct SignInWithEmailAndPasswordPayload<'a> {
+    pub(crate) email: &'a str,
+    pub(crate) password: &'a str,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct SignInWithPhoneAndPasswordPayload {
-    pub(crate) phone: String,
-    pub(crate) password: String,
+pub struct SignInWithPhoneAndPasswordPayload<'a> {
+    pub(crate) phone: &'a str,
+    pub(crate) password: &'a str,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct SignUpWithEmailAndPasswordPayload {
-    pub(crate) email: String,
-    pub(crate) password: String,
+pub struct SignUpWithEmailAndPasswordPayload<'a> {
+    pub(crate) email: &'a str,
+    pub(crate) password: &'a str,
     pub(crate) options: Option<SignUpWithPasswordOptions>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct SignUpWithPhoneAndPasswordPayload {
-    pub(crate) phone: String,
-    pub(crate) password: String,
+pub struct SignUpWithPhoneAndPasswordPayload<'a> {
+    pub(crate) phone: &'a str,
+    pub(crate) password: &'a str,
     pub(crate) options: Option<SignUpWithPasswordOptions>,
 }
 
@@ -188,8 +188,8 @@ pub struct SignUpWithPasswordOptions {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct RequestMagicLinkPayload {
-    pub(crate) email: String,
+pub struct RequestMagicLinkPayload<'a> {
+    pub(crate) email: &'a str,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -200,8 +200,8 @@ pub struct UpdateUserPayload {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct SendSMSOtpPayload {
-    pub phone: String,
+pub struct SendSMSOtpPayload<'a> {
+    pub phone: &'a str,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -278,8 +278,8 @@ pub enum SignInWithOtp {
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Default)]
-pub struct SignInWithEmailOtpPayload {
-    pub email: String,
+pub struct SignInWithEmailOtpPayload<'a> {
+    pub email: &'a str,
     pub options: Option<SignInEmailOtpParams>,
 }
 
@@ -316,8 +316,8 @@ pub struct SignInMobileOtpParams {
 }
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub struct RefreshSessionPayload {
-    pub refresh_token: String,
+pub struct RefreshSessionPayload<'a> {
+    pub refresh_token: &'a str,
 }
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
