@@ -150,26 +150,26 @@ pub enum LoginOptions {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct SignInWithEmailAndPasswordPayload<'a> {
+pub(crate) struct SignInWithEmailAndPasswordPayload<'a> {
     pub(crate) email: &'a str,
     pub(crate) password: &'a str,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct SignInWithPhoneAndPasswordPayload<'a> {
+pub(crate) struct SignInWithPhoneAndPasswordPayload<'a> {
     pub(crate) phone: &'a str,
     pub(crate) password: &'a str,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct SignUpWithEmailAndPasswordPayload<'a> {
+pub(crate) struct SignUpWithEmailAndPasswordPayload<'a> {
     pub(crate) email: &'a str,
     pub(crate) password: &'a str,
     pub(crate) options: Option<SignUpWithPasswordOptions>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct SignUpWithPhoneAndPasswordPayload<'a> {
+pub(crate) struct SignUpWithPhoneAndPasswordPayload<'a> {
     pub(crate) phone: &'a str,
     pub(crate) password: &'a str,
     pub(crate) options: Option<SignUpWithPasswordOptions>,
@@ -188,19 +188,19 @@ pub struct SignUpWithPasswordOptions {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct RequestMagicLinkPayload<'a> {
+pub(crate) struct RequestMagicLinkPayload<'a> {
     pub(crate) email: &'a str,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct UpdateUserPayload {
+pub struct UpdatedUser {
     pub email: Option<String>,
     pub password: Option<String>,
     pub data: Option<serde_json::Value>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct SendSMSOtpPayload<'a> {
+pub(crate) struct SendSMSOtpPayload<'a> {
     pub phone: &'a str,
 }
 
@@ -270,15 +270,8 @@ pub struct VerifyOtpOptions {
     pub redirect_to: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub enum SignInWithOtp {
-    Mobile(SignInMobileOtpParams),
-    Email(SignInEmailOtpParams),
-    WhatsApp(SignInMobileOtpParams),
-}
-
 #[derive(Debug, Serialize, Deserialize, PartialEq, Default)]
-pub struct SignInWithEmailOtpPayload<'a> {
+pub(crate) struct SignInWithEmailOtpPayload<'a> {
     pub email: &'a str,
     pub options: Option<SignInEmailOtpParams>,
 }
@@ -316,12 +309,12 @@ pub struct SignInMobileOtpParams {
 }
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub struct RefreshSessionPayload<'a> {
+pub(crate) struct RefreshSessionPayload<'a> {
     pub refresh_token: &'a str,
 }
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub struct ResetPasswordForEmailPayload {
+pub(crate) struct ResetPasswordForEmailPayload {
     pub email: String,
 }
 

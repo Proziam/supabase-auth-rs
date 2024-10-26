@@ -3,7 +3,7 @@ use std::{collections::HashMap, env, thread};
 
 use supabase_auth::models::{
     AuthClient, LogoutScope, ResendParams, SignInWithOAuthOptions, SignInWithSSO,
-    SignUpWithPasswordOptions, UpdateUserPayload,
+    SignUpWithPasswordOptions, UpdatedUser,
 };
 
 fn create_test_client() -> AuthClient {
@@ -246,7 +246,7 @@ async fn update_user_test() {
 
     eprintln!("{:?}", session);
 
-    let updated_user = UpdateUserPayload {
+    let updated_user = UpdatedUser {
         email: Some(demo_email.clone()),
         password: Some("qqqqwwww".to_string()),
         data: None,
@@ -272,7 +272,7 @@ async fn update_user_test() {
     }
 
     // Return the user to original condition
-    let original_user = UpdateUserPayload {
+    let original_user = UpdatedUser {
         email: Some(demo_email),
         password: Some("qwerqwer".to_string()),
         data: None,

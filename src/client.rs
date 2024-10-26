@@ -17,7 +17,7 @@ use crate::{
         Session, SignInEmailOtpParams, SignInWithEmailAndPasswordPayload,
         SignInWithEmailOtpPayload, SignInWithOAuthOptions, SignInWithPhoneAndPasswordPayload,
         SignInWithSSO, SignUpWithEmailAndPasswordPayload, SignUpWithPasswordOptions,
-        SignUpWithPhoneAndPasswordPayload, UpdateUserPayload, User, VerifyOtpParams, AUTH_V1,
+        SignUpWithPhoneAndPasswordPayload, UpdatedUser, User, VerifyOtpParams, AUTH_V1,
     },
 };
 
@@ -275,8 +275,6 @@ impl AuthClient {
         }
     }
 
-    // TODO: Fix Return Type https://supabase.com/docs/reference/javascript/auth-signinwithotp
-
     /// Send a Login OTP via SMS
     ///
     /// # Example
@@ -463,7 +461,7 @@ impl AuthClient {
     /// ```
     pub async fn update_user(
         &self,
-        updated_user: UpdateUserPayload,
+        updated_user: UpdatedUser,
         bearer_token: &str,
     ) -> Result<User, Error> {
         let mut headers = header::HeaderMap::new();
@@ -474,7 +472,7 @@ impl AuthClient {
             HeaderValue::from_str(&format!("Bearer {}", bearer_token))?,
         );
 
-        let body = serde_json::to_string::<UpdateUserPayload>(&updated_user)?;
+        let body = serde_json::to_string::<UpdatedUser>(&updated_user)?;
 
         let response = self
             .client
