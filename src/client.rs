@@ -414,9 +414,7 @@ impl AuthClient {
             .client
             .get(format!(
                 "{}{}/authorize?provider={}",
-                self.project_url,
-                AUTH_V1,
-                provider.to_string()
+                self.project_url, AUTH_V1, provider
             ))
             .headers(headers)
             .body(body)
@@ -800,12 +798,12 @@ impl AuthClient {
         let res_body = response.text().await?;
 
         if res_status.is_success() {
-            return Ok(());
+            Ok(())
         } else {
-            return Err(Error::AuthError {
+            Err(Error::AuthError {
                 status: res_status,
                 message: res_body,
-            });
+            })
         }
     }
 
