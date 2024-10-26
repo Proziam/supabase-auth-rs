@@ -393,7 +393,7 @@ async fn test_sso_login() {
 
     let url = auth_client.sso(params).await.unwrap();
 
-    println!("{}", url.to_string());
+    println!("{}", url);
 
     assert!(url.to_string().len() > 1);
 }
@@ -419,7 +419,7 @@ async fn get_settings_test() {
 
     let settings = auth_client.get_settings().await.unwrap();
 
-    assert!(settings.external.github == true)
+    assert!(settings.external.github)
 }
 
 #[tokio::test]
@@ -428,5 +428,5 @@ async fn get_health_test() {
 
     let health = auth_client.get_health().await.unwrap();
 
-    assert!(health.description != "")
+    assert!(!health.description.is_empty())
 }
