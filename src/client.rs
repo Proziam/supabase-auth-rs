@@ -242,6 +242,8 @@ impl AuthClient {
     /// named like this here. You can also pass in the same signup options
     /// that work for the other `sign_up_*` methods, but that's not required.
     ///
+    /// This method requires anonymous sign in to be enabled in your dashboard.
+    ///
     /// # Example
     /// ```
     /// let session = auth_client

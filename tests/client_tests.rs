@@ -414,6 +414,17 @@ async fn invite_by_email_test() {
 }
 
 #[tokio::test]
+async fn sign_in_anonymously_test() {
+    let auth_client = create_test_client();
+
+    let session = auth_client.sign_in_anonymously(None).await.unwrap();
+
+    println!("{}", session.user.created_at);
+
+    assert!(!session.access_token.is_empty() && session.user.role == "authenticated")
+}
+
+#[tokio::test]
 async fn get_settings_test() {
     let auth_client = create_test_client();
 
