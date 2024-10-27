@@ -14,7 +14,7 @@ use crate::{
         AuthClient, AuthServerHealth, AuthServerSettings, IdTokenCredentials, InviteParams,
         LogoutScope, OAuthResponse, OTPResponse, Provider, RefreshSessionPayload,
         RequestMagicLinkPayload, ResendParams, ResetPasswordForEmailPayload, SendSMSOtpPayload,
-        Session, SignInEmailOtpParams, SignInWithEmailAndPasswordPayload,
+        Session, SignInAnonymouslyPayload, SignInEmailOtpParams, SignInWithEmailAndPasswordPayload,
         SignInWithEmailOtpPayload, SignInWithOAuthOptions, SignInWithPhoneAndPasswordPayload,
         SignInWithSSO, SignUpWithEmailAndPasswordPayload, SignUpWithPasswordOptions,
         SignUpWithPhoneAndPasswordPayload, UpdatedUser, User, VerifyOtpParams, AUTH_V1,
@@ -211,6 +211,51 @@ impl AuthClient {
             password,
             options,
         };
+
+        let mut headers = header::HeaderMap::new();
+        headers.insert(CONTENT_TYPE, HeaderValue::from_str("application/json")?);
+        headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
+
+        let body = serde_json::to_string(&payload)?;
+
+        let response = self
+            .client
+            .post(format!("{}{}/signup", self.project_url, AUTH_V1))
+            .headers(headers)
+            .body(body)
+            .send()
+            .await?;
+
+        let res_status = response.status();
+        let res_body = response.text().await?;
+
+        let session: Session = from_str(&res_body).map_err(|_| AuthError {
+            status: res_status,
+            message: res_body,
+        })?;
+
+        Ok(session)
+    }
+
+    /// Sign in a new user anonymously. This actually signs up a user, but it's
+    /// called "sign in" by Supabase in their own client, so that's why it's
+    /// named like this here. You can also pass in the same signup options
+    /// that work for the other `sign_up_*` methods, but that's not required.
+    ///
+    /// # Example
+    /// ```
+    /// let session = auth_client
+    ///     .sign_in_anonymously(demo_options)
+    ///     .await
+    ///     .unwrap();
+    ///
+    /// assert!(session.user.user_metadata.display_name == demo_options.data.display_name)
+    /// ```
+    pub async fn sign_in_anonymously(
+        &self,
+        options: Option<SignUpWithPasswordOptions>,
+    ) -> Result<Session, Error> {
+        let payload = SignInAnonymouslyPayload { options };
 
         let mut headers = header::HeaderMap::new();
         headers.insert(CONTENT_TYPE, HeaderValue::from_str("application/json")?);

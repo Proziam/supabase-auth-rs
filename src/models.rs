@@ -176,6 +176,11 @@ pub(crate) struct SignUpWithPhoneAndPasswordPayload<'a> {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub(crate) struct SignInAnonymouslyPayload {
+    pub(crate) options: Option<SignUpWithPasswordOptions>,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SignUpWithPasswordOptions {
     /// The redirect url embedded in the email link
     pub email_redirect_to: Option<String>,
