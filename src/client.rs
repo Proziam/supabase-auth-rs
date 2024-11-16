@@ -456,6 +456,33 @@ impl AuthClient {
         }
     }
 
+    /// Sign up a user using an OAuth provider.
+    /// # Example
+    /// ```
+    /// // You can add custom parameters using a HashMap<String, String>
+    /// let mut params = HashMap::new();
+    /// params.insert("key".to_string(), "value".to_string());
+    ///
+    /// let options = SignInWithOAuthOptions {
+    ///     query_params: Some(params),
+    ///     redirect_to: Some("localhost".to_string()),
+    ///     scopes: Some("repo gist notifications".to_string()),
+    ///     skip_brower_redirect: Some(true),
+    /// };
+    ///
+    /// let response = auth_client
+    ///     .sign_up_with_oauth(supabase_auth::models::Provider::Github, Some(options))
+    ///     .await
+    ///     .unwrap();
+    /// ```
+    pub async fn sign_up_with_oauth(
+        &self,
+        provider: Provider,
+        options: Option<SignInWithOAuthOptions>,
+    ) -> Result<OAuthResponse, Error> {
+        self.login_with_oauth(provider, options).await
+    }
+
     /// Return the signed in User
     /// # Example
     /// ```
