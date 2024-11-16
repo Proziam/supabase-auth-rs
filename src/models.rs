@@ -103,7 +103,7 @@ pub struct IdTokenCredentials {
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Default)]
-pub struct SignInWithOAuthOptions {
+pub struct LoginWithOAuthOptions {
     pub query_params: Option<HashMap<String, String>>,
     pub redirect_to: Option<String>,
     pub scopes: Option<String>,
@@ -152,13 +152,13 @@ pub enum LoginOptions {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub(crate) struct SignInWithEmailAndPasswordPayload<'a> {
+pub(crate) struct LoginWithEmailAndPasswordPayload<'a> {
     pub(crate) email: &'a str,
     pub(crate) password: &'a str,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub(crate) struct SignInWithPhoneAndPasswordPayload<'a> {
+pub(crate) struct LoginWithPhoneAndPasswordPayload<'a> {
     pub(crate) phone: &'a str,
     pub(crate) password: &'a str,
 }
@@ -178,7 +178,7 @@ pub(crate) struct SignUpWithPhoneAndPasswordPayload<'a> {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub(crate) struct SignInAnonymouslyPayload {
+pub(crate) struct LoginAnonymouslyPayload {
     pub(crate) options: Option<SignUpWithPasswordOptions>,
 }
 
@@ -278,21 +278,21 @@ pub struct VerifyOtpOptions {
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Default)]
-pub(crate) struct SignInWithEmailOtpPayload<'a> {
+pub(crate) struct LoginWithEmailOtpPayload<'a> {
     pub email: &'a str,
-    pub options: Option<SignInEmailOtpParams>,
+    pub options: Option<LoginEmailOtpParams>,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Default)]
-pub struct SignInWithEmailOtp {
+pub struct LoginWithEmailOtp {
     /// The user's phone number.
     pub email: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub options: Option<SignInEmailOtpParams>,
+    pub options: Option<LoginEmailOtpParams>,
 }
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub struct SignInEmailOtpParams {
+pub struct LoginEmailOtpParams {
     /// Verification token received when the user completes the captcha on the site.
     pub captcha_token: Option<String>,
     /// A custom data object to store the user's metadata. This maps to the `auth.users.raw_user_meta_data` column.
@@ -304,7 +304,7 @@ pub struct SignInEmailOtpParams {
 }
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub struct SignInMobileOtpParams {
+pub struct LoginMobileOtpParams {
     /// Verification token received when the user completes the captcha on the site.
     pub captcha_token: Option<String>,
     /// A custom data object to store the user's metadata. This maps to the `auth.users.raw_user_meta_data` column.
@@ -499,7 +499,7 @@ pub enum LogoutScope {
 }
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub struct SignInWithSSO {
+pub struct LoginWithSSO {
     #[serde(skip_serializing_if = "Option::is_none")]
     /// UUID of the SSO provider to invoke single-sign on to
     pub provider_id: Option<String>,
@@ -507,11 +507,11 @@ pub struct SignInWithSSO {
     /// Domain of the SSO provider where users can initiate sign on
     pub domain: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub options: Option<SSOSignInOptions>,
+    pub options: Option<SSOLoginOptions>,
 }
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub struct SSOSignInOptions {
+pub struct SSOLoginOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
     /// Verification token received when the user completes the captcha on the site.
     captcha_token: Option<String>,

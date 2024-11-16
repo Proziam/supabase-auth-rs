@@ -2,7 +2,7 @@ use core::time;
 use std::{collections::HashMap, env, thread};
 
 use supabase_auth::models::{
-    AuthClient, LogoutScope, ResendParams, SignInWithOAuthOptions, SignInWithSSO,
+    AuthClient, LoginWithOAuthOptions, LoginWithSSO, LogoutScope, ResendParams,
     SignUpWithPasswordOptions, UpdatedUser,
 };
 
@@ -149,7 +149,7 @@ async fn send_email_with_otp() {
 }
 
 #[tokio::test]
-async fn sign_in_with_oauth_test() {
+async fn login_with_oauth_test() {
     let auth_client = create_test_client();
 
     let mut params = HashMap::new();
@@ -157,7 +157,7 @@ async fn sign_in_with_oauth_test() {
     params.insert("second_key".to_string(), "second_value".to_string());
     params.insert("third_key".to_string(), "third_value".to_string());
 
-    let options = SignInWithOAuthOptions {
+    let options = LoginWithOAuthOptions {
         query_params: Some(params),
         redirect_to: Some("localhost".to_string()),
         scopes: Some("repo gist notifications".to_string()),
@@ -185,7 +185,7 @@ async fn sign_up_with_oauth_test() {
     params.insert("second_key".to_string(), "second_value".to_string());
     params.insert("third_key".to_string(), "third_value".to_string());
 
-    let options = SignInWithOAuthOptions {
+    let options = LoginWithOAuthOptions {
         query_params: Some(params),
         redirect_to: Some("localhost".to_string()),
         scopes: Some("repo gist notifications".to_string()),
@@ -204,7 +204,7 @@ async fn sign_up_with_oauth_test() {
 }
 
 #[tokio::test]
-async fn sign_in_with_oauth_no_options_test() {
+async fn login_with_oauth_no_options_test() {
     let auth_client = create_test_client();
 
     // // Must login to get a user bearer token
@@ -413,7 +413,7 @@ async fn logout_test() {
 async fn test_sso_login() {
     let auth_client = create_test_client();
     let demo_domain = env::var("DEMO_DOMAIN").unwrap();
-    let params = SignInWithSSO {
+    let params = LoginWithSSO {
         domain: Some(demo_domain),
         options: None,
         provider_id: None,
@@ -442,10 +442,10 @@ async fn invite_by_email_test() {
 }
 
 #[tokio::test]
-async fn sign_in_anonymously_test() {
+async fn login_anonymously_test() {
     let auth_client = create_test_client();
 
-    let session = auth_client.sign_in_anonymously(None).await.unwrap();
+    let session = auth_client.login_anonymously(None).await.unwrap();
 
     println!("{}", session.user.created_at);
 

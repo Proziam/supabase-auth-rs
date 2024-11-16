@@ -12,11 +12,11 @@ use crate::{
     error::Error::{self, AuthError},
     models::{
         AuthClient, AuthServerHealth, AuthServerSettings, IdTokenCredentials, InviteParams,
-        LogoutScope, OAuthResponse, OTPResponse, Provider, RefreshSessionPayload,
+        LoginAnonymouslyPayload, LoginEmailOtpParams, LoginWithEmailAndPasswordPayload,
+        LoginWithEmailOtpPayload, LoginWithOAuthOptions, LoginWithPhoneAndPasswordPayload,
+        LoginWithSSO, LogoutScope, OAuthResponse, OTPResponse, Provider, RefreshSessionPayload,
         RequestMagicLinkPayload, ResendParams, ResetPasswordForEmailPayload, SendSMSOtpPayload,
-        Session, SignInAnonymouslyPayload, SignInEmailOtpParams, SignInWithEmailAndPasswordPayload,
-        SignInWithEmailOtpPayload, SignInWithOAuthOptions, SignInWithPhoneAndPasswordPayload,
-        SignInWithSSO, SignUpWithEmailAndPasswordPayload, SignUpWithPasswordOptions,
+        Session, SignUpWithEmailAndPasswordPayload, SignUpWithPasswordOptions,
         SignUpWithPhoneAndPasswordPayload, UpdatedUser, User, VerifyOtpParams, AUTH_V1,
     },
 };
@@ -73,7 +73,7 @@ impl AuthClient {
     /// assert!(session.user.email == demo_email)
     /// ```
     pub async fn login_with_email(&self, email: &str, password: &str) -> Result<Session, Error> {
-        let payload = SignInWithEmailAndPasswordPayload { email, password };
+        let payload = LoginWithEmailAndPasswordPayload { email, password };
 
         let mut headers = header::HeaderMap::new();
         headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
@@ -113,7 +113,7 @@ impl AuthClient {
     /// assert!(session.user.phone == demo_phone)
     /// ```
     pub async fn login_with_phone(&self, phone: &str, password: &str) -> Result<Session, Error> {
-        let payload = SignInWithPhoneAndPasswordPayload { phone, password };
+        let payload = LoginWithPhoneAndPasswordPayload { phone, password };
 
         let mut headers = header::HeaderMap::new();
         headers.insert(CONTENT_TYPE, HeaderValue::from_str("application/json")?);
@@ -247,17 +247,17 @@ impl AuthClient {
     /// # Example
     /// ```
     /// let session = auth_client
-    ///     .sign_in_anonymously(demo_options)
+    ///     .login_anonymously(demo_options)
     ///     .await
     ///     .unwrap();
     ///
     /// assert!(session.user.user_metadata.display_name == demo_options.data.display_name)
     /// ```
-    pub async fn sign_in_anonymously(
+    pub async fn login_anonymously(
         &self,
         options: Option<SignUpWithPasswordOptions>,
     ) -> Result<Session, Error> {
-        let payload = SignInAnonymouslyPayload { options };
+        let payload = LoginAnonymouslyPayload { options };
 
         let mut headers = header::HeaderMap::new();
         headers.insert(CONTENT_TYPE, HeaderValue::from_str("application/json")?);
@@ -369,9 +369,9 @@ impl AuthClient {
     pub async fn send_email_with_otp(
         &self,
         email: &str,
-        options: Option<SignInEmailOtpParams>,
+        options: Option<LoginEmailOtpParams>,
     ) -> Result<OTPResponse, Error> {
-        let payload = SignInWithEmailOtpPayload { email, options };
+        let payload = LoginWithEmailOtpPayload { email, options };
 
         let mut headers = header::HeaderMap::new();
         headers.insert(CONTENT_TYPE, HeaderValue::from_str("application/json")?);
@@ -408,7 +408,7 @@ impl AuthClient {
     /// let mut params = HashMap::new();
     /// params.insert("key".to_string(), "value".to_string());
     ///
-    /// let options = SignInWithOAuthOptions {
+    /// let options = LoginWithOAuthOptions {
     ///     query_params: Some(params),
     ///     redirect_to: Some("localhost".to_string()),
     ///     scopes: Some("repo gist notifications".to_string()),
@@ -423,7 +423,7 @@ impl AuthClient {
     pub async fn login_with_oauth(
         &self,
         provider: Provider,
-        options: Option<SignInWithOAuthOptions>,
+        options: Option<LoginWithOAuthOptions>,
     ) -> Result<OAuthResponse, Error> {
         let mut headers = header::HeaderMap::new();
         headers.insert(CONTENT_TYPE, HeaderValue::from_str("application/json")?);
@@ -463,7 +463,7 @@ impl AuthClient {
     /// let mut params = HashMap::new();
     /// params.insert("key".to_string(), "value".to_string());
     ///
-    /// let options = SignInWithOAuthOptions {
+    /// let options = LoginWithOAuthOptions {
     ///     query_params: Some(params),
     ///     redirect_to: Some("localhost".to_string()),
     ///     scopes: Some("repo gist notifications".to_string()),
@@ -478,7 +478,7 @@ impl AuthClient {
     pub async fn sign_up_with_oauth(
         &self,
         provider: Provider,
-        options: Option<SignInWithOAuthOptions>,
+        options: Option<LoginWithOAuthOptions>,
     ) -> Result<OAuthResponse, Error> {
         self.login_with_oauth(provider, options).await
     }
@@ -576,11 +576,11 @@ impl AuthClient {
     /// };
     ///
     /// let session = auth_client
-    ///     .sign_in_with_id_token(credentials)
+    ///     .login_with_id_token(credentials)
     ///     .await
     ///     .unwrap();
     /// ```
-    pub async fn sign_in_with_id_token(
+    pub async fn login_with_id_token(
         &self,
         credentials: IdTokenCredentials,
     ) -> Result<Session, Error> {
@@ -771,7 +771,7 @@ impl AuthClient {
     /// ```
     /// // When a user signs in they get a session
     /// let original_session = auth_client
-    ///     .sign_in_with_email_and_password(demo_email.as_ref(), demo_password)
+    ///     .login_with_email_and_password(demo_email.as_ref(), demo_password)
     ///     .await
     ///     .unwrap();
     ///
@@ -942,12 +942,12 @@ impl AuthClient {
     ///
     /// println!("{}", url.to_string());
     /// ```
-    pub async fn sso(&self, params: SignInWithSSO) -> Result<Url, Error> {
+    pub async fn sso(&self, params: LoginWithSSO) -> Result<Url, Error> {
         let mut headers = HeaderMap::new();
         headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
         headers.insert("apikey", HeaderValue::from_str(&self.api_key)?);
 
-        let body = serde_json::to_string::<crate::models::SignInWithSSO>(&params)?;
+        let body = serde_json::to_string::<crate::models::LoginWithSSO>(&params)?;
 
         let response = self
             .client
