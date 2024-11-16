@@ -1,5 +1,10 @@
 # Supabase Auth
 
+![Crates.io License](https://img.shields.io/crates/l/supabase-auth?style=for-the-badge)
+[![Crates.io Version](https://img.shields.io/crates/v/supabase-auth?style=for-the-badge)](https://crates.io/crates/supabase-auth)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/proziam/supabase-auth-rs/rust.yml?branch=main&style=for-the-badge)
+[![docs.rs](https://img.shields.io/docsrs/supabase-auth?style=for-the-badge)](https://docs.rs/supabase-auth/latest/supabase_auth/index.html)
+
 This is a Rust implementation of the [supabase js auth client](https://github.com/supabase/gotrue-js). The goal is to have feature parity and an easy-to-use API. 
 
 Currently this software is functional, but not yet battle-tested. The goal is to go to 1.0.0 by the end of December, 2024.
