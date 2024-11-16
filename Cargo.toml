@@ -15,7 +15,7 @@ repository = "https://github.com/proziam/supabase-auth-rs"
 reqwest = "0.12.7"
 serde = { version = "1.0.208", features = ["derive"] }
 serde_json = "1.0.127"
-thiserror = "1.0.63"
+thiserror = "2.0.3"
 
 [dev-dependencies]
 uuid = { version = "1.10.0", features = ["v7"] }
