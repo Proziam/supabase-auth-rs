@@ -175,6 +175,34 @@ async fn sign_in_with_oauth_test() {
     assert!(response.unwrap().url.to_string().len() > 1);
 }
 
+#[ignore]
+#[tokio::test]
+async fn sign_up_with_oauth_test() {
+    let auth_client = create_test_client();
+
+    let mut params = HashMap::new();
+    params.insert("key".to_string(), "value".to_string());
+    params.insert("second_key".to_string(), "second_value".to_string());
+    params.insert("third_key".to_string(), "third_value".to_string());
+
+    let options = SignInWithOAuthOptions {
+        query_params: Some(params),
+        redirect_to: Some("localhost".to_string()),
+        scopes: Some("repo gist notifications".to_string()),
+        skip_brower_redirect: Some(true),
+    };
+
+    let response = auth_client
+        .sign_up_with_oauth(supabase_auth::models::Provider::Github, Some(options))
+        .await;
+
+    if response.is_err() {
+        println!("SIGN IN WITH OAUTH TEST RESPONSE -- \n{:?}", response);
+    }
+
+    assert!(response.unwrap().url.to_string().len() > 1);
+}
+
 #[tokio::test]
 async fn sign_in_with_oauth_no_options_test() {
     let auth_client = create_test_client();
