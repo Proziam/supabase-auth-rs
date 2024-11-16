@@ -416,7 +416,7 @@ impl AuthClient {
     /// };
     ///
     /// let response = auth_client
-    ///     .sign_in_with_oauth(supabase_auth::models::Provider::Github, Some(options))
+    ///     .login_with_oauth(supabase_auth::models::Provider::Github, Some(options))
     ///     .await
     ///     .unwrap();
     /// ```
