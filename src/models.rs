@@ -10,7 +10,7 @@ use std::{collections::HashMap, fmt::Display};
 pub struct AuthClient {
     pub(crate) client: Client,
     /// REST endpoint for querying and managing your database
-    /// Example: https://<project id>.supabase.co
+    /// Example: `https://YOUR_PROJECT_ID.supabase.co`
     pub(crate) project_url: String,
     /// WARN: The `service role` key has the ability to bypass Row Level Security. Never share it publicly.
     pub(crate) api_key: String,

@@ -1,3 +1,18 @@
+/*!
+The `client` module provides a comprehensive interface for interacting with Supabase Authentication services.
+
+This module enables user authentication, session management, user administration, and server health monitoring
+through the [`AuthClient`] struct.
+
+# Notes
+
+- Some features require Supabase Pro plan subscription
+- OAuth and SSO require configuration in Supabase dashboard
+- Rate limiting may apply to authentication operations
+- Always use HTTPS in production environments
+- Properly handle token expiration and refresh cycles
+*/
+
 #![cfg(not(doctest))]
 
 use std::env;
@@ -23,7 +38,7 @@ use crate::{
 
 impl AuthClient {
     /// Create a new Auth Client
-    /// You can find your project url and keys at https://supabase.com/dashboard/project/<your project id>/settings/api
+    /// You can find your project url and keys at `https://supabase.com/dashboard/project/YOUR_PROJECT_ID/settings/api`
     /// # Example
     /// ```
     /// let auth_client = AuthClient::new(project_url, api_key, jwt_secret).unwrap();

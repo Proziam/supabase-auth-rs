@@ -1,3 +1,12 @@
+/*!
+Provides error types and handling for Supabase authentication operations.
+
+This module defines the primary [`Error`] enum and supporting types for handling various
+error conditions that may occur during authentication operations.
+
+The most common error is [`Error::Supabase`] which wraps [`SupabaseHTTPError`]. This is a transparent error which gives you the `status` as a [`StatusCode`] and `message` from the Supabase response.
+*/
+
 use std::{
     env,
     fmt::{self, Display},
