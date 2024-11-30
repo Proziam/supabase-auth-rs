@@ -410,6 +410,7 @@ async fn logout_test() {
 }
 
 #[tokio::test]
+#[ignore = "SSO Requires Pro plan"]
 async fn test_sso_login() {
     let auth_client = create_test_client();
     let demo_domain = env::var("DEMO_DOMAIN").unwrap();
