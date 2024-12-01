@@ -13,8 +13,6 @@ through the [`AuthClient`] struct.
 - Properly handle token expiration and refresh cycles
 */
 
-#![cfg(not(doctest))]
-
 use std::env;
 
 use reqwest::{

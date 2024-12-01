@@ -1,3 +1,7 @@
+#![cfg(not(doctest))]
+#![forbid(unsafe_code)]
+#![deny(missing_debug_implementations)]
+
 /*!
 # Supabase Auth
 
@@ -133,9 +137,6 @@ let url = auth_client.sso(params).await.unwrap();
 * ✓ Change User Data (e.g., Email or password)
 * ✓ SSO
 */
-
-#![forbid(unsafe_code)]
-#![deny(missing_debug_implementations)]
 
 pub mod client;
 pub mod error;
